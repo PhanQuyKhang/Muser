@@ -8,7 +8,7 @@ This guide records the agreed visual direction and provides proposed defaults fo
 
 Related functional specification: [MUSER_FEATURES.md](./MUSER_FEATURES.md).
 
-Scope revision: this design includes the expanded navigation, custom playlists, global search, avatar upload, and two Explore feeds approved after the original feature document. Where the older feature document differs, this guide records the newer design decisions; the feature document has not yet been synchronized.
+Scope synchronization: this design aligns with the updated [MUSER_FEATURES.md](./MUSER_FEATURES.md) and [MUSER_DATABASE.md](./MUSER_DATABASE.md), including the expanded five-tab navigation, custom playlists, global search, avatar upload, and two Explore feeds (My Explore & My Friends).
 
 ## 2. Agreed design direction
 

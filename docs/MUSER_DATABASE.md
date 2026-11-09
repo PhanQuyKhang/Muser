@@ -1,6 +1,6 @@
 # Muser — Firestore database design
 
-Status: proposed implementation baseline. Latest conversation decisions take precedence over the older MUSER_FEATURES.md, which still describes an earlier MVP.
+Status: agreed implementation baseline, synchronized with [MUSER_FEATURES.md](./MUSER_FEATURES.md) and [MUSER_DESIGN.md](./MUSER_DESIGN.md).
 
 ## 1. Architecture and conventions
 
