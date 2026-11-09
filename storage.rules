@@ -1,0 +1,43 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // -------------------------------------------------------------
+    // 1. Music Catalog (Section 4, 12 & 13)
+    // Structure:
+    //   catalog/audio/{songId}/{assetVersion}.mp3
+    //   catalog/covers/{albumOrSongId}/{assetVersion}.jpg
+    //   catalog/artists/{artistId}/{assetVersion}.jpg
+    // Read: Authenticated users can stream and display
+    // Write: Admin only (clients denied direct write)
+    // -------------------------------------------------------------
+    match /catalog/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
+    // -------------------------------------------------------------
+    // 2. User Avatars (Section 3, 12 & 13)
+    // Structure:
+    //   avatars/{uid}/{assetVersion}.jpg
+    // Read: Authenticated users (for friend views & profiles)
+    // Write: Account owner only, max 5MB, image MIME type only
+    // -------------------------------------------------------------
+    match /avatars/{uid}/{assetVersion} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(uid)
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/(jpeg|png|webp)');
+    }
+  }
+}
+
