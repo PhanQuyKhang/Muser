@@ -66,7 +66,7 @@ Scope synchronization: this design aligns with the updated [MUSER_FEATURES.md](.
 
 ## 5. Typography
 
-Use Onest for English UI. Sizes below are logical UI units: Figma reference px and Flutter logical pixels; allow system text scaling in implementation.
+Use Onest for English UI. Sizes below are logical UI units: Figma reference px and React Native logical pixels; allow system text scaling in implementation.
 
 | Style | Size | Line height | Weight | Usage |
 | --- | --- | --- | --- | --- |
@@ -174,7 +174,7 @@ Additional icons may be sourced if needed. Phosphor remains an optional fallback
 - Retain playback state when switching tabs.
 - Display above bottom navigation after a user starts a song from Playlist or Search.
 - Use the same playback session as Explore and the full player. Never start a second independent audio player.
-- Hide the mini player while the Explore card is controlling the current discovery track, and in the full-player view, to avoid duplicate controls. Restore it when leaving those views if audio remains active.
+- Hide the mini player when viewing the Explore tab (where the Explore card deck controls audio preview) and in the full-player view, to avoid duplicate controls. Restore it above bottom navigation when leaving those views if audio remains active.
 - Previous/next mean track navigation; label them differently from the card's 10-second seek actions.
 - Disable unavailable previous/next actions at queue boundaries. Do not imply wraparound unless implemented.
 
@@ -191,7 +191,7 @@ Additional icons may be sourced if needed. Phosphor remains an optional fallback
 - Clamp seek actions to the track's start/end. Replay seeks to the beginning and starts playback.
 - Use a horizontal seek bar; dragging it or tapping a control must not trigger a card swipe.
 - Place like/skip actions in a separate action area. A heart tap has the same effect as a completed right swipe.
-- My Friends cards additionally show the sharing friend's avatar and display name.
+- My Friends cards additionally show the sharing friend's avatar, display name, and an explicit Heart Reaction control (with a distinct "Sent" state once tapped). Tapping the Heart Reaction sends an immutable reaction to the sharing friend's Activity feed and never adds the song to the user's Liked library. The swipe-right / Save-to-Liked action remains separate: swiping right (or tapping the Save/Like button) adds the song to the user's Liked library and shares it under the user's name if sharing is enabled.
 
 ### Familiar Bar
 
@@ -290,7 +290,7 @@ Header: “Explore”, followed by subtabs **My Explore** and **My Friends**. Th
 **My Friends**
 
 - Same swipe/playback layout and gestures, using music shared by accepted friends.
-- Include the sharer's avatar and display name, with copy such as “Loved by Alex”.
+- Include the sharer's avatar and display name, with copy such as “Loved by Alex”. A separate Heart Reaction control allows reacting directly to the friend's share; tapping it changes the button to a "Sent" state and writes an event to the recipient's Activity feed. Crucially, the Heart Reaction never adds the song to the current user's Liked library. To save the song, the user swipes right (or taps the Save button), which adds it to Liked and shares it if sharing is enabled.
 - If several friends shared a song, show a compact avatar group and names/count; present one song card rather than identical consecutive cards.
 - Friend attribution means direct accepted friends, not a chain of friends-of-friends.
 - No accepted friends: provide “Add friend”. No shared music: explain the empty state without inventing cards.
@@ -353,14 +353,13 @@ Never label a normal user's action “Delete song” if it only removes a person
 
 ### 9.7 Search
 
-- Search the entire available catalog by song title or artist name.
+- Search the entire available catalog by song title or artist name. For the 50–100 track MVP catalog, active catalog metadata is fetched and cached locally; Global Search filters this cached catalog on-device using a brief UI debounce for smooth typing, while retaining loading and retry states for the initial catalog fetch.
 - Persistent search field, clear-text action, loading state, results, and no-results state.
 - Rows show artwork, title, artist, and an overflow/add action.
 - Tap a song to play; show the common mini player.
 - “Add to playlist” chooses a personal playlist; an explicit heart action can add to Liked.
 - Adding to a personal playlist does not implicitly like or share the song.
 - Explicit likes from Search or a player add to Liked privately; automatic sharing is triggered by new right swipes/heart actions on Explore cards only. Use clear action labels rather than assuming every save publishes.
-- A brief debounce avoids querying on every keystroke. Cancel or ignore stale responses.
 - Global search and playlist-local search must have distinct placeholders: “Search songs or artists” vs “Search this playlist”.
 
 ### 9.8 Full player
@@ -375,10 +374,10 @@ Never label a normal user's action “Delete song” if it only removes a person
 
 This tab manages relationships. Music discovery through friends lives under **Explore → My Friends**.
 
-- Show current friends with avatar, display name/nickname, and username.
+- Show current friends with avatar, display name, and username.
 - Search/add flow uses exact normalized username, with no-result and pending states.
 - Requests section shows incoming requests with Accept/Decline and a count badge when applicable.
-- Show outgoing pending requests; do not allow another invitation for an existing relationship.
+- Show outgoing pending requests with a “Cancel” action to revoke the request; do not allow another invitation for an existing relationship.
 - Remove-friend action uses confirmation and updates the relationship immediately after success.
 - Removing a friend revokes mutual access to shared music, including cached UI on refresh; backend authorization must enforce the same rule.
 - Prevent self-invitations, duplicate requests, and accepting someone else's request.
@@ -386,10 +385,11 @@ This tab manages relationships. Music discovery through friends lives under **Ex
 
 ### 9.10 Account and settings
 
-- Header: avatar, display name, username.
+- Header: avatar, display name, username, and email.
 - “Edit profile”: change display name and upload/change avatar from the device photo picker. Username editing is outside the initial scope; keep it read-only after setup.
 - Avatar upload flow: choose image → preview/crop if available → save; show progress, invalid-file, and retry states. Keep the previous avatar if upload fails.
 - Use an initials fallback if no avatar is set or the image fails to load.
+- “Activity”: opens the Activity feed (S24), displaying incoming heart reactions received from friends on shared music (actor avatar, display name, song title, relative timestamp). If a shared song was unliked or the friendship was removed, gracefully display “Shared song is no longer available” instead of private or revoked share content.
 - Music preference editing is excluded from Account by user request. Keep initial music setup in onboarding.
 - “Privacy”: sharing switch and a concise explanation of visibility.
 - “Sign out”: end the session and clear private user views/playback from the previous account.
@@ -409,9 +409,9 @@ This tab manages relationships. Music discovery through friends lives under **Ex
 
 ## 9B. Detailed Figma screen inventory
 
-Design baseline: **22 main screens + 10 overlays/sheets = 32 base frames** after removing Account music preference editing. With approximately 8–12 representative state frames, plan for **40–44 frames**. Component variants and animation transition frames may increase the actual Figma frame count; these are not additional independent application screens. Screen IDs remain stable; S22 is retired.
+Design baseline: **23 main screens + 10 overlays/sheets = 33 base frames** after removing Account music preference editing and adding the dedicated Activity feed. With approximately 8–12 representative state frames, plan for **41–45 frames**. Component variants and animation transition frames may increase the actual Figma frame count; these are not additional independent application screens. Screen IDs remain stable; S22 is retired; S24 is the dedicated Activity feed.
 
-### Main screens — 22
+### Main screens — 23
 
 | ID | Screen | Required content |
 | --- | --- | --- |
@@ -425,18 +425,19 @@ Design baseline: **22 main screens + 10 overlays/sheets = 32 base frames** after
 | S08 | Choose favorite artists | Artist search, avatar/name, selected state, Back/Continue/Skip. |
 | S09 | Sharing preference | Swipe-to-save/share explanation, Enable sharing, Not now. Default off. |
 | S10 | Explore — My Explore | Subtabs, fire/discovery-level entry, current mode, artwork card, title/artist, timeline, play/pause, replay, ±10-second seek, skip/like, sharing status. |
-| S11 | Explore — My Friends | Same card/player/swipe layout, friend avatar/name or grouped attribution. No discovery-level selector. |
+| S11 | Explore — My Friends | Same card/player/swipe layout, friend avatar/name or grouped attribution, explicit Heart Reaction control with Sent state (sends reaction to friend's Activity, never adds to Liked), save/skip affordances. No discovery-level selector. |
 | S12 | Playlist overview | Permanent Liked playlist, personal playlists, Create playlist, mini player when applicable. |
 | S13 | Liked detail | Title/cover/count, search within playlist, Newest/Oldest added sort, tracks, play, Unlike, Add to playlist. No rename/delete-playlist action. |
 | S14 | Personal playlist detail | Title/cover/count, local search/sort, tracks, playback, rename/delete menu, add/remove membership. One reusable layout for every personal playlist. |
 | S15 | Global Search | Search songs or artists across the catalog, result rows, play, explicit like, Add to playlist; distinct from playlist-local search. |
 | S16 | Full player | Large artwork, title/artist, timeline/timestamps, previous/play-pause/next, liked state, Add to playlist, collapse. |
-| S17 | Friends list | Current friends' avatars, nicknames, usernames, Add friend, Requests entry, remove-friend action. |
+| S17 | Friends list | Current friends' avatars, display names, usernames, Add friend, Requests entry, remove-friend action. |
 | S18 | Find friends | Exact username search, result, Add friend, Request sent/Already friends states. |
-| S19 | Friend requests | Incoming requests with Accept/Decline; outgoing requests with Pending status. |
-| S20 | Account | Avatar, display name, username, email, Edit profile, Privacy, Sign out. No music preference editor. |
-| S21 | Edit profile | Change nickname, choose/upload avatar, read-only username, Save, upload progress/error. |
+| S19 | Friend requests | Incoming requests with Accept/Decline; outgoing requests with Pending status and Cancel action. |
+| S20 | Account | Avatar, display name, username, email, Edit profile, Activity, Privacy, Sign out. No music preference editor. |
+| S21 | Edit profile | Change display name, choose/upload avatar, read-only username, Save, upload progress/error. |
 | S23 | Privacy | Share discoveries with friends switch, current state, explanation of disabling and re-enabling sharing. |
+| S24 | Activity feed | List of received heart reactions from friends (actor avatar, display name, song title, relative timestamp), empty state ("No activity yet"), and revoked share fallback ("Shared song is no longer available"). |
 
 S06–S08 remain initial-setup screens. Do not add an Account route back to these preference selectors. S22 has been removed from scope.
 
@@ -457,7 +458,7 @@ Mini player is a shared component, not a separate screen: place above bottom nav
 | O09 | Remove friend | Confirm relationship removal and resulting loss of shared-music access. |
 | O10 | Avatar preview | Selected image, Use photo / Choose another, upload feedback. |
 
-The operating system's photo picker does not need a custom Figma screen. A personal playlist's overflow action menu can be a small reusable component alongside the rename/delete sheets; additional component/menu instances are not included in the 33-frame baseline.
+The operating system's photo picker does not need a custom Figma screen. A personal playlist's overflow action menu can be a small reusable component alongside the rename/delete sheets; additional component/menu instances are not included in the 33 base frames.
 
 ### Representative extra states — approximately 8–12 frames
 
@@ -471,8 +472,9 @@ The operating system's photo picker does not need a custom Figma screen. A perso
 - Audio playback failure with Retry/Skip.
 - Avatar upload failure with the previous image preserved.
 - Save/share failure with Retry.
+- Activity feed empty state and revoked share fallback ("Shared song is no longer available").
 
-Combine representative states where sensible and use component variants rather than duplicating every screen. The 40–44 estimate is a planning range, not a requirement to draw every possible combination.
+Combine representative states where sensible and use component variants rather than duplicating every screen. The 41–45 estimate is a planning range, not a requirement to draw every possible combination.
 
 ### Required end-to-end prototype flows
 
@@ -481,13 +483,14 @@ Combine representative states where sensible and use component variants rather t
 | First use | S01–S04 are static Opening/Auth designs in this delivery; the wired setup flow starts at S05 and continues through S09 → S10. |
 | Reset password | Static reset form and success state; no prototype connection in this delivery. |
 | Personal discovery | S10 → O01 → select level → Apply → S10 → swipe/heart → saved feedback; liked song appears in S13. |
-| Friends' discovery | S10 → S11 → see attribution → swipe/heart → Liked and sharing according to privacy setting. |
+| Friends' discovery | S10 → S11 → see attribution → swipe/heart to save to Liked (and share if opted in); separate tap on Heart Reaction sends reaction to friend's Activity feed (shows Sent state) without adding to Liked. |
 | Playlist creation | S12 → O02 → new S14; reuse O03 for adding tracks and creating a playlist from that context. |
 | Organize music | S13/S14 → O05/O03 → add elsewhere; remove only the current membership or explicitly unlike via O08. |
 | Playlist playback | S13/S14 → tap track → mini player → S16 → collapse; show local search and O04 sort. |
 | Global discovery by search | S15 → query → results → play/S16 or O03; saves here do not silently publish. |
-| Friendship | S17 → S18 → request sent; recipient S19 → Accept → S17; remove via O09; shared music becomes available in S11 only for accepted friends. |
+| Friendship | S17 → S18 → request sent; outgoing pending request in S19 can be cancelled; recipient S19 → Accept → S17; remove via O09; shared music becomes available in S11 only for accepted friends. |
 | Profile editing | S20 → S21 → device picker placeholder → O10 → Save → updated S20. |
+| Activity feed | S20 → S24 → view incoming heart reactions and revoked share fallback. |
 | Privacy | S20 → S23 → disable sharing → S11 recipient-side state hides those shares; enable again without republishing old likes. |
 | Sign out | S20 → Sign out → S02; prior user's private content/playback is cleared. |
 
@@ -570,7 +573,7 @@ Proposed pages:
 ## 14. Delivery priorities for one month
 
 - Core: authentication, music setup, five-tab shell, playback, both Explore feeds, tag-based discovery levels, Liked, personal playlist management, catalog search, friend management, Account/privacy.
-- Reuse: one song row, one discovery card, one audio session, one add-to-playlist sheet, and the same preference selectors for setup/editing.
+- Reuse: one song row, one discovery card, one audio session, one add-to-playlist sheet, and the same preference selectors for initial setup.
 - Keep avatar upload simple and catalog size small. Confirm an upload/storage solution within the project's free-tier constraints before implementation.
 - Polish last: opening animation, decorative card motion, custom playlist imagery, and advanced transitions.
 - Outside this revision: chat, comments, public profiles, push notifications, downloads, advanced AI, collaborative playlists, and commercial-scale streaming infrastructure.

@@ -20,7 +20,7 @@ usernames/{normalizedUsername}        Unique username reservation
 users/{uid}                           Private settings and onboarding
   likes/{songId}                      Canonical Liked membership
   songSignals/{songId}                Private recommendation aggregates
-  devices/{installationId}            Optional push registrations
+  devices/{installationId}            (Post-MVP / Future push registrations)
   activity/{reactionId}               One received reaction = one row
 artists/{artistId}
 albums/{albumId}
@@ -59,16 +59,18 @@ Fields: uid:string, createdAt:Timestamp. Normalize lowercase and enforce an agre
 | --- | --- | --- |
 | onboardingCompletedAt | Timestamp/null | Initial setup completion |
 | seedTagIds | string[] | Bounded initial genre/mood choices |
-| seedSongIds | string[] | Initial favorite songs; UI requires at least five |
+| seedSongIds | string[] | Initial favorite songs (0–5 items); optional and skippable during onboarding |
 | seedArtistIds | string[] | Bounded initial artist choices |
 | discoveryLevel | enum | familiar / explore / surprise |
 | sharingEnabled | boolean | Default false |
 | shareEpoch | integer | Privacy generation; starts at zero |
-| notificationPreferences | map | reactionsPush, friendRequestsPush booleans |
+| notificationPreferences | map | (Post-MVP / Future) reactionsPush, friendRequestsPush booleans |
 | activityReadThroughAt | Timestamp/null | Activity watermark for unread indication |
 | createdAt, updatedAt | Timestamp | Audit dates |
 
 Only owner/backend can read. No Music preferences editor in Account; seed choices are captured at onboarding. Firebase Auth supplies email to the owner; avoid unnecessary duplicate email fields.
+
+Partial / unfinished onboarding: If a user exits between profile/username setup (S05) and completing onboarding (S09), `onboardingCompletedAt` remains null. The app's opening session routing (MUSER_DESIGN.md §9.2) checks this field; if null, it resumes the unfinished onboarding flow (S06–S09) rather than routing to Explore (S10). Calling `completeOnboarding` writes the final seed selections, sets `onboardingCompletedAt` to trusted server time, and marks onboarding complete.
 
 Privacy generation: every true → false sharing transition increments shareEpoch atomically. Enabling does not reset it. A share is visible only if its epoch matches the current owner epoch AND sharing is enabled. This prevents old shares resurfacing on re-enable without updating every share document.
 
@@ -119,15 +121,16 @@ Store Storage object paths, not expiring signed URLs. Playback resolves an autho
 Fields: songId:string, likedAt:Timestamp, source:my_explore/friends/search/playlist, sourceShareId:string/null, activeShareId:string/null.
 
 - Document existence means liked; song ID prevents duplicate membership.
-- Save from My Explore while sharing is enabled can create a share atomically.
-- Save from Search, playlist or My Friends stays private. A heart reaction never adds a like.
+- An eligible new Like (not already in likes) created by swiping right / liking from either My Explore or My Friends atomically creates a new active share owned by the current user under their current shareEpoch (when sharingEnabled == true), never copying or forwarding the friend's share record.
+- Likes from Search, Playlist, or Full Player remain private by default (no automatic share creation).
+- A heart reaction on My Friends sends an Activity event only and never adds a like or creates a share.
 - Saving an already-liked song is a no-op: do not change likedAt or create a new share.
 - Unlike deletes this membership and marks any active share inactive in one transaction. It does not remove custom playlist memberships or past reactions.
 - Explicit fresh unlike → like may create a new share when eligible; enforce abuse limits separately.
 
 ### playlists/{playlistId}
 
-Fields: ownerId:string, name:string, description:string/null, coverPath:string/null, createdAt:Timestamp, updatedAt:Timestamp.
+Fields: ownerId:string, name:string, description:string/null (Post-MVP / Future; current UI supports playlist name only), coverPath:string/null, createdAt:Timestamp, updatedAt:Timestamp.
 
 All custom playlists are private in current product. No collaboration or playlist-publication feature is implied.
 
@@ -163,7 +166,7 @@ Fields: memberIds:string[2], requesterId:string, recipientId:string, status:pend
 
 Fields: ownerId:string, songId:string, sharedAt:Timestamp, epoch:integer, active:boolean, deactivatedAt:Timestamp/null, deactivationReason:unliked/owner_deleted/null.
 
-A new share is created only by an eligible new My Explore like while sharing is enabled. sharedAt belongs to this event; it is not a song-level or playlist-level field.
+A new share is created only by an eligible new like from either My Explore or My Friends while sharing is enabled. It is owned by the current user under their current shareEpoch and does not copy or forward a friend's share record. sharedAt belongs to this event; it is not a song-level or playlist-level field.
 
 Backend may return a share only when ALL are true:
 
@@ -199,7 +202,7 @@ Create reaction and recipient Activity document in the SAME transaction. Activit
 
 UI resolves actor identity and catalog metadata from caches/batched reads. If a share becomes inaccessible, show “Shared song is no longer available” instead of returning private share data. History may remain, but it must not grant access to revoked shares. Marking Activity read is allowed via the private watermark; it is not an unsend.
 
-Optional push: enqueue delivery only after commit. Push failure must not roll back the reaction. Deduplicate notifications by reactionId and honor preferences. Avoid exposing sensitive titles in lock-screen payloads by default.
+Optional push (Post-MVP / Future): enqueue delivery only after commit. Push failure must not roll back the reaction. Deduplicate notifications by reactionId and honor preferences. Avoid exposing sensitive titles in lock-screen payloads by default.
 
 ## 9. Recommendation data and playback
 
@@ -209,11 +212,11 @@ Fields: songId:string, impressionCount:number, skipCount:number, playCount:numbe
 
 These are bounded per-song aggregates, not growing event arrays. Likes are authoritative in likes, not a duplicated isLiked flag. Listening data is private; batch/debounce updates rather than writing every progress tick. Treat client telemetry as untrusted input. A future analytics pipeline can collect raw events separately with retention policies.
 
-Current 50-song approach: fetch/cache active metadata, combine onboarding seeds, likes and signals, score in app or backend behind RecommendationService. If recommendation moves server-side, the schema need not change. Do not persist every generated queue unless cross-device queue continuity becomes a requirement.
+Current 50–100 track approach: fetch/cache active metadata, combine onboarding seeds, likes and signals, score in app or backend behind RecommendationService. If recommendation moves server-side, the schema need not change. Do not persist every generated queue unless cross-device queue continuity becomes a requirement.
 
 Playback progress and queue live in player state/local storage. Optional cross-device resume can later add users/{uid}/state/player; do not write playback seconds continuously to Firestore.
 
-### users/{uid}/devices/{installationId} (optional push)
+### users/{uid}/devices/{installationId} (Post-MVP / Future push registrations)
 
 Fields: pushProvider:fcm/expo, pushToken:string, platform:android/ios, enabled:boolean, updatedAt:Timestamp. Owner/backend only. Upsert on token changes; disable/unlink on logout; remove invalid tokens. Tokens are not public profile fields.
 
@@ -226,7 +229,7 @@ All list operations use limits and cursor pagination, never offsets for long fee
 | My playlists | playlists ownerId == uid, order updatedAt desc | ownerId asc, updatedAt desc |
 | Liked latest/oldest | user's likes order likedAt desc/asc | Single-field default |
 | Playlist songs | items order addedAt desc/asc | Single-field default |
-| Artist page | songs artistIds array-contains id, status == active, order title | artistIds array, status asc, title asc |
+| (Post-MVP / Future) Artist page | songs artistIds array-contains id, status == active, order title | artistIds array, status asc, title asc |
 | Friends | friendships memberIds array-contains uid, status == accepted, order updatedAt desc | memberIds array, status asc, updatedAt desc |
 | Incoming requests | recipientId == uid, status == pending, order requestedAt desc | recipientId asc, status asc, requestedAt desc |
 | Outgoing requests | requesterId == uid, status == pending, order requestedAt desc | requesterId asc, status asc, requestedAt desc |
@@ -234,7 +237,7 @@ All list operations use limits and cursor pagination, never offsets for long fee
 | Activity | recipient's activity order createdAt desc | Single-field default |
 | Username lookup | usernames/{normalizedUsername} document lookup | None |
 
-Firestore does not provide arbitrary substring/full-text music search or SQL JOINs. With 50 songs, filter cached catalog locally for title/artist and playlist search. At scale, use a dedicated search index. Never promise substring search through a normalizedTitle equality query.
+Firestore does not provide arbitrary substring/full-text music search or SQL JOINs. With 50–100 tracks, filter cached catalog locally for title/artist and playlist search. At scale, use a dedicated search index. Never promise substring search through a normalizedTitle equality query.
 
 ## 11. Backend use-case contracts
 
@@ -242,7 +245,7 @@ These are proposed app API operations, not existing Firebase REST endpoints. Imp
 
 | Operation | Input | Result / atomic work |
 | --- | --- | --- |
-| completeOnboarding | username, displayName, seeds, sharing choice | Reserve username, create identity/private settings |
+| completeOnboarding | username, displayName, seeds, sharing choice | Reserve username (if not already reserved during S05), commit seed choices, and set onboardingCompletedAt to finalize setup. Unfinished onboarding (onboardingCompletedAt == null) resumes at S06–S09. |
 | setSharing | enabled | Transaction on setting + epoch |
 | likeSong | songId, source, sourceShareId? | Create like once; eligible share in same transaction |
 | unlikeSong | songId | Delete like + deactivate linked share |
@@ -269,7 +272,7 @@ Race handling: sendHeart reads the same friendship, share, like and owner settin
 | Shares | Authorized backend response | Backend only |
 | Reactions | Authorized backend views | Backend create; no user update/delete |
 | Activity | Recipient/backend | Backend creates; recipient read watermark is separate |
-| Devices | Owner/backend | Owner registration/backend cleanup |
+| Devices (Post-MVP) | Owner/backend | Owner registration/backend cleanup |
 
 Storage rules are separate from Firestore rules. Avatar uploads must validate owner path, file size and MIME type; server-side validation/processing is needed for stronger content guarantees. Catalog upload is admin-only. App can request audio access only for available licensed songs.
 

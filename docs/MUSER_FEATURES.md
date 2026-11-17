@@ -101,8 +101,7 @@ The **Playlist** tab manages all saved music and user collections:
 
 The **Search** tab provides full-catalog exploration:
 
-- Search across all active catalog tracks by song title or artist name.
-- Input debounce prevents redundant network queries while typing.
+- For the 50–100 track MVP catalog, active catalog metadata is fetched and cached locally; Global Search filters this cached catalog on-device by song title or artist name using a brief UI debounce for smooth typing, with clear loading and retry states for the initial catalog fetch.
 - Result rows display album art, title, artist, and actionable controls:
   - Tap row to immediately stream the song (spawns the mini player).
   - Heart action to save to Liked (private save; does not auto-publish to friends' feeds).
@@ -138,7 +137,7 @@ The **Account** tab oversees user identity, privacy settings, and session state:
     - **When Enabled:** New right-swiped tracks in My Explore create active shares tagged with the current epoch.
     - **When Disabled:** Atomically increments `shareEpoch`, immediately hiding all past shares from friends' feeds. Liked tracks in the user's private library remain untouched.
     - **When Re-enabled:** Only newly liked tracks in the new epoch become visible to friends; historical shares from previous epochs remain permanently hidden.
-- **Activity Feed:** Lists incoming heart reactions received from friends on shared music.
+- **Activity Feed:** Lists incoming heart reactions received from friends on shared music (with fallback display such as "Shared song is no longer available" if the share was revoked or unfriended).
 - **Sign Out:** Terminated authenticated session, cleans up local player state, and resets sensitive cache.
 
 ---
@@ -191,7 +190,7 @@ The shared Mini Player is docked above the bottom navigation bar across all appl
   - **My Explore:** Right swipe likes tracks; Familiar Bar toggle visibly shifts recommendations between Familiar, Explore, and Surprise.
   - **My Friends:** Displays tracks shared by accepted friends with sharer attribution; user can send a heart reaction that creates an Activity item for the sharer.
 - [ ] Playlist tab displays the Liked playlist and supports creating, renaming, deleting custom playlists, and adding/removing songs.
-- [ ] Global Search returns instant catalog results with input debounce; tracks can be streamed or added to playlists directly from search results.
+- [ ] Global Search filters cached catalog results on-device with smooth input debounce; tracks can be streamed or added to playlists directly from search results.
 - [ ] Single audio player session functions reliably: Mini Player docks properly, Full Player expands smoothly, and audio persists during tab navigation.
 - [ ] Two separate accounts can search each other by username, exchange friend requests, and mutually view shared music.
 - [ ] Toggling sharing OFF immediately conceals all previously shared tracks from friends; toggling sharing back ON does not resurrect past shares.
