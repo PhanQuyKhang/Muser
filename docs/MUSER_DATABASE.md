@@ -96,8 +96,10 @@ Catalog is writable only by trusted administration/import code. Active catalog m
   albumId: "album_slow_rush", // nullable for singles
   coverPath: "catalog/covers/slow-rush.jpg",
   durationMs: 237000,
+  peakStartMs: 71000, // where My Explore starts playback (chorus/peak); plays on to the end
   tagIds: ["genre_alternative", "mood_chill"],
   explicit: false,
+  popularityRank: 900260, // optional; Deezer relative popularity (higher = more popular), not a play count
   status: "active", // active | unavailable | archived
   audio: {
     storagePath: "catalog/audio/borderline.mp3",
@@ -109,6 +111,8 @@ Catalog is writable only by trusted administration/import code. Active catalog m
   updatedAt: Timestamp
 }
 ```
+
+peakStartMs is the position (0 <= value < durationMs) where the My Explore card deck begins playback, so a swipe lands on the chorus instead of the intro. Playback then continues normally to the end of the song, with no separate preview length. Every other surface (Full Player, Library, Search, playlists) starts at 0. The audio file is unchanged; this is only a seek position. Values must be curated per song.
 
 artistIds supports collaborations; artistNames and coverPath are deliberate display duplication. Artist records remain authoritative; trusted maintenance updates copied names when renamed. Use actual cleared catalog data; this example is structural, not a license to host the named track.
 

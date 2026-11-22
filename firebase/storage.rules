@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// Muser Storage rules (see docs/MUSER_DATABASE.md §12-13, docs/MUSER_ARCHITECTURE.md §2).
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Audio is never readable directly: the API checks availability and issues a
+    // time-limited URL. Catalog uploads happen only through admin tooling (Admin SDK).
+    match /catalog/audio/{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // Artwork is non-licensed-audio metadata: signed-in users may read, nobody writes.
+    match /catalog/covers/{allPaths=**} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /catalog/artists/{allPaths=**} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Avatar uploads land in a per-user STAGING path. The backend validates the file and
+    // publishes it to avatars/{uid}/..., so clients never write the public path.
+    match /staging/avatars/{uid}/{file} {
+      allow write: if signedIn()
+                   && request.auth.uid == uid
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/(jpeg|png|webp)');
+      allow read: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Published avatars: friend identity is visible to signed-in users; backend writes.
+    match /avatars/{uid}/{allPaths=**} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

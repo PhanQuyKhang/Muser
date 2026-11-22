@@ -9,15 +9,6 @@
       ]
     },
     {
-      "collectionGroup": "songs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "artistIds", "arrayConfig": "CONTAINS" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "title", "order": "ASCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "friendships",
       "queryScope": "COLLECTION",
       "fields": [
@@ -53,8 +44,16 @@
         { "fieldPath": "active", "order": "ASCENDING" },
         { "fieldPath": "sharedAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "songs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "artistIds", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "title", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
 }
-
