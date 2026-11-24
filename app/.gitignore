@@ -7,3 +7,4 @@ npm-debug.*
 *.key
 *.mobileprovision
 expo-env.d.ts
+.claude/
