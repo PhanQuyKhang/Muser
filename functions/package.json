@@ -1,0 +1,29 @@
+{
+  "name": "muser-functions",
+  "private": true,
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run --exclude \"**/*.emulator.test.ts\"",
+    "test": "firebase emulators:exec --only auth --project demo-muser --config ../firebase.json \"vitest run\""
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "firebase-admin": "^14.5.1",
+    "firebase-functions": "^7.4.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.6",
+    "@types/supertest": "^7.2.1",
+    "firebase-tools": "^15.37.0",
+    "supertest": "^7.3.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.1"
+  }
+}
