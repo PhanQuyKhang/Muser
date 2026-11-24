@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, TextInput, View, type TextInputProps } from "react-native";
 
-import { colors, radii, sizes, spacing, typography } from "@/shared/theme";
+import { colors, radii, sizes, spacing, typography, type ColorToken } from "@/shared/theme";
 import { Icon } from "../Icon";
 import { Text } from "../Text";
 
@@ -24,6 +24,8 @@ export interface InputProps extends Pick<
   error?: string | undefined;
   /** Hint under the field (for example password rules). Replaced by the error when there is one. */
   helper?: string | undefined;
+  /** Color of the helper text; use secondary for positive confirmation. */
+  helperColor?: ColorToken;
   /** Adds a show/hide control and hides the characters. */
   secure?: boolean;
 }
@@ -32,6 +34,7 @@ export function Input({
   label,
   error,
   helper,
+  helperColor = "textSecondary",
   secure = false,
   editable = true,
   ...rest
@@ -69,11 +72,11 @@ export function Input({
         ) : null}
       </View>
       {error ? (
-        <Text variant="caption" color="error" accessibilityLiveRegion="polite">
+        <Text variant="micro" color="error" accessibilityLiveRegion="polite">
           {error}
         </Text>
       ) : helper ? (
-        <Text variant="caption" color="textSecondary">
+        <Text variant="micro" color={helperColor} accessibilityLiveRegion="polite">
           {helper}
         </Text>
       ) : null}

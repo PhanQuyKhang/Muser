@@ -1,5 +1,3 @@
-import { PlaceholderScreen } from "@/features/placeholder/PlaceholderScreen";
+import { ProfileScreen } from "@/features/onboarding/screens/ProfileScreen";
 
-export default function Profile() {
-  return <PlaceholderScreen title="Set up profile" />;
-}
+export default ProfileScreen;

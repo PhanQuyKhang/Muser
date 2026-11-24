@@ -5,12 +5,16 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ServicesProvider, type Services } from "@/application/services";
 import type { AuthRepository } from "@/domain/auth";
+import type { CatalogRepository } from "@/domain/catalog";
 import type { MeRepository } from "@/domain/me";
+import type { OnboardingRepository } from "@/domain/onboarding";
 
 export function createFakeServices(
   overrides: {
     auth?: Partial<AuthRepository>;
     me?: Partial<MeRepository>;
+    catalog?: Partial<CatalogRepository>;
+    onboarding?: Partial<OnboardingRepository>;
   } = {},
 ): Services {
   const auth: AuthRepository = {
@@ -31,7 +35,20 @@ export function createFakeServices(
     })),
     ...overrides.me,
   };
-  return { auth, me };
+  const catalog: CatalogRepository = {
+    listTags: jest.fn(async () => []),
+    listSongs: jest.fn(async () => ({ items: [], nextCursor: null })),
+    listArtists: jest.fn(async () => ({ items: [], nextCursor: null })),
+    search: jest.fn(async () => ({ songs: [], artists: [] })),
+    ...overrides.catalog,
+  };
+  const onboarding: OnboardingRepository = {
+    createProfile: jest.fn(async () => {}),
+    isUsernameAvailable: jest.fn(async () => true),
+    complete: jest.fn(async () => {}),
+    ...overrides.onboarding,
+  };
+  return { auth, me, catalog, onboarding };
 }
 
 const safeAreaMetrics = {

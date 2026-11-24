@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { meQueryKey } from "@/application/me-cache";
 import { useServices } from "@/application/services";
 import { useSessionStore } from "@/application/session";
 import { resolveStartRoute } from "@/domain/me";
@@ -16,7 +17,7 @@ export function useStartRoute(): StartRouteState {
   const uid = useSessionStore((state) => state.user?.uid);
 
   const query = useQuery({
-    queryKey: ["me", uid],
+    queryKey: meQueryKey(uid),
     queryFn: () => me.getMe(),
     enabled: session === "signedIn",
     retry: false,

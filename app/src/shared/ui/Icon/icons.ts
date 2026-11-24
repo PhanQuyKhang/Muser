@@ -24,6 +24,23 @@ export const icons = {
       "M6.33325 11.0833L18.9999 20.5833L31.6666 11.0833",
     ],
   },
+  search: {
+    viewBox: "0 0 24 24",
+    strokeWidth: 1.8,
+    paths: [
+      "M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z",
+      "M21 21L16.65 16.65",
+    ],
+  },
+  check: { viewBox: "0 0 24 24", strokeWidth: 2.4, paths: ["M5 12.5L9.5 17L19 7.5"] },
+  close: { viewBox: "0 0 24 24", strokeWidth: 1.8, paths: ["M6 6L18 18", "M18 6L6 18"] },
+  circle: {
+    viewBox: "0 0 24 24",
+    strokeWidth: 1.8,
+    paths: [
+      "M12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z",
+    ],
+  },
   chevronLeft: { viewBox: "0 0 24 24", strokeWidth: 1.8, paths: ["M15 5L8 12L15 19"] },
 } as const satisfies Record<string, IconDefinition>;
 

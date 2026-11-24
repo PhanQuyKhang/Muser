@@ -1,5 +1,3 @@
-import { PlaceholderScreen } from "@/features/placeholder/PlaceholderScreen";
+import { MusicTypesScreen } from "@/features/onboarding/screens/MusicTypesScreen";
 
-export default function MusicTypes() {
-  return <PlaceholderScreen title="Music types" />;
-}
+export default MusicTypesScreen;

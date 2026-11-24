@@ -5,7 +5,8 @@ import { colors, radii, sizes, spacing, type ColorToken } from "@/shared/theme";
 import { Text } from "../Text";
 
 export type ButtonVariant = "primary" | "secondary" | "like" | "tertiary" | "destructive";
-export type ButtonSize = "md" | "sm";
+/** md: 50 (forms), sm: 48 (compact), lg: 52 with the larger radius (footer call to action). */
+export type ButtonSize = "md" | "sm" | "lg";
 
 export interface ButtonProps {
   label: string;
@@ -37,6 +38,7 @@ const variants: Record<ButtonVariant, VariantStyle> = {
 const heights: Record<ButtonSize, number> = {
   md: sizes.buttonHeight,
   sm: sizes.touchTarget,
+  lg: sizes.ctaHeight,
 };
 
 export function Button({
@@ -53,10 +55,17 @@ export function Button({
   const inactive = disabled || loading;
   const { background, text } = variants[variant];
 
+  // Disabled filled buttons go neutral (as in the Figma Continue state) instead of just fading.
+  const filled = background !== "transparent";
   const container: ViewStyle = {
     height: heights[size],
     minHeight: sizes.touchTarget,
-    backgroundColor: background === "transparent" ? "transparent" : colors[background],
+    borderRadius: size === "lg" ? radii.cta : radii.control,
+    backgroundColor: !filled
+      ? "transparent"
+      : disabled
+        ? colors.surfaceElevated
+        : colors[background],
     alignSelf: fullWidth ? "stretch" : "flex-start",
   };
 
@@ -67,12 +76,7 @@ export function Button({
       accessibilityState={{ disabled: inactive, busy: loading }}
       disabled={inactive}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.base,
-        container,
-        disabled && styles.disabled,
-        pressed && styles.pressed,
-      ]}
+      style={({ pressed }) => [styles.base, container, pressed && styles.pressed]}
     >
       <View style={[styles.content, loading && styles.hidden]}>
         {leftIcon}
@@ -101,6 +105,5 @@ const styles = StyleSheet.create({
   content: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   hidden: { opacity: 0 },
   spinner: { flex: 1, alignItems: "center", justifyContent: "center" },
-  disabled: { opacity: 0.5 },
   pressed: { opacity: 0.85 },
 });

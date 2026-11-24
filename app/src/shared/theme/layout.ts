@@ -19,6 +19,8 @@ export const radii = {
   card: 22,
   /** Bottom sheets (top corners). */
   sheet: 24,
+  /** Footer call-to-action buttons (large Continue). */
+  cta: 16,
   /** Fully rounded chips, pills and circular buttons. */
   pill: 999,
 } as const;
@@ -29,6 +31,7 @@ export const sizes = {
   pagePadding: 24,
   inputHeight: 52,
   buttonHeight: 50,
+  ctaHeight: 52,
   actionButtonHeight: 48,
   /** Minimum interactive area (accessibility). */
   touchTarget: 48,

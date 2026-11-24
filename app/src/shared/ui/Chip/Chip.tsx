@@ -7,18 +7,24 @@ export interface ChipProps {
   label: string;
   selected?: boolean;
   onPress: () => void;
+  /** pill: compact rounded chip (moods, filters). tile: bordered 50-high tile, sized by its parent (genres). */
+  shape?: "pill" | "tile";
 }
 
-/** Selectable pill (genre and mood choices, filters). Selection is not color-only: it also flips the label color. */
-export function Chip({ label, selected = false, onPress }: ChipProps) {
+/** Selectable choice. Selection is not color-only: the label color flips too, and it is exposed as `selected`. */
+export function Chip({ label, selected = false, onPress, shape = "pill" }: ChipProps) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[styles.base, selected ? styles.selected : styles.idle]}
+      style={[
+        styles.base,
+        shape === "tile" ? styles.tile : styles.pill,
+        selected && styles.selected,
+      ]}
     >
-      <Text variant="label" color={selected ? "onAccent" : "textPrimary"}>
+      <Text variant="label" color={selected ? "onAccent" : "textPrimary"} numberOfLines={1}>
         {label}
       </Text>
     </Pressable>
@@ -27,13 +33,17 @@ export function Chip({ label, selected = false, onPress }: ChipProps) {
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: sizes.touchTarget - 8,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radii.pill,
-    borderWidth: sizes.borderWidth,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
   },
-  idle: { backgroundColor: colors.surface, borderColor: colors.border },
+  pill: { minHeight: 44, borderRadius: radii.card },
+  tile: {
+    height: 50,
+    borderRadius: radii.control,
+    borderWidth: sizes.borderWidth,
+    borderColor: colors.border,
+  },
   selected: { backgroundColor: colors.primary, borderColor: colors.primary },
 });

@@ -23,6 +23,8 @@ export const typography = {
   label: { fontFamily: fontFamily.semibold, fontSize: 14, lineHeight: 20 },
   fieldLabel: { fontFamily: fontFamily.medium, fontSize: 12, lineHeight: 17 },
   navigation: { fontFamily: fontFamily.medium, fontSize: 12, lineHeight: 16 },
+  micro: { fontFamily: fontFamily.regular, fontSize: 11, lineHeight: 15 },
+  microMedium: { fontFamily: fontFamily.medium, fontSize: 11, lineHeight: 15 },
   caption: { fontFamily: fontFamily.regular, fontSize: 10, lineHeight: 14 },
   captionMedium: { fontFamily: fontFamily.medium, fontSize: 10, lineHeight: 14 },
   eyebrow: { fontFamily: fontFamily.semibold, fontSize: 9, lineHeight: 13, letterSpacing: 0.8 },

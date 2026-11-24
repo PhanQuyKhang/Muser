@@ -1,9 +1,11 @@
 export { Avatar, initialsOf } from "./Avatar";
 export { Button } from "./Button";
 export { Chip } from "./Chip";
+export { CoverArt } from "./CoverArt";
 export { Icon } from "./Icon";
 export { Input } from "./Input";
 export { Screen } from "./Screen";
+export { SearchField } from "./SearchField";
 export { Skeleton } from "./Skeleton";
 export { EmptyState, ErrorState } from "./StateView";
 export { Switch } from "./Switch";
