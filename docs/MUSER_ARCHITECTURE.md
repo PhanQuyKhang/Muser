@@ -315,6 +315,9 @@ Version business API under /v1; publish OpenAPI contracts with input/output sche
 | PUT /v1/me/likes/:songId | Idempotent save, source metadata |
 | DELETE /v1/me/likes/:songId | Unlike and deactivate share |
 | POST /v1/playlists | Create custom playlist |
+| GET /v1/playlists | The caller's active playlists, most recently updated first (cursor paged) |
+| GET /v1/playlists/:id | One owned playlist (404 for others' or missing, so existence is not revealed) |
+| GET /v1/playlists/:id/items | Playlist songs with song data; `sort=newest\|oldest`, cursor paged |
 | PATCH /v1/playlists/:id | Rename/update owner playlist |
 | DELETE /v1/playlists/:id | Mark deleting and clean descendants |
 | PUT/DELETE /v1/playlists/:id/items/:songId | Add/remove membership |

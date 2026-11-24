@@ -5,6 +5,7 @@ import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createApp } from "../../../bootstrap/app";
 import { CatalogService } from "../../catalog/application/catalog.service";
 import { FirestoreCatalogRepository } from "../../catalog/infrastructure/firestore-catalog.repository";
+import type { LibraryService } from "../../library/application/library.service";
 import { CheckUsernameUseCase } from "../application/check-username.use-case";
 import { CompleteOnboardingUseCase } from "../application/complete-onboarding.use-case";
 import { CreateProfileUseCase } from "../application/create-profile.use-case";
@@ -26,6 +27,7 @@ describe.skipIf(!host)("profile + onboarding against the Firestore emulator", ()
     const uow = new FirestoreIdentityUnitOfWork(db);
     const queries = new FirestoreIdentityQueries(db);
     app = createApp({
+      library: {} as LibraryService, // not used by identity routes
       // Test tokens look like "t-<uid>"; the real verifier is covered by the auth tests.
       verifier: { verify: async (t) => (t.startsWith("t-") ? { uid: t.slice(2) } : Promise.reject(new Error("bad"))) },
       catalog,

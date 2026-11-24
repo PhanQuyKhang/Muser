@@ -23,6 +23,8 @@ export interface CatalogRepository {
   listTags(): Promise<Tag[]>;
   listSongs(query: SongQuery): Promise<SongPage>;
   getSong(id: string): Promise<Song | null>;
+  /** Active songs among these ids (batched read); unknown or inactive ids are omitted. */
+  getSongs(ids: string[]): Promise<Song[]>;
   getArtist(id: string): Promise<Artist | null>;
   /** Which of these ids exist AND are active in the given collection. */
   findActiveIds(collection: "tags" | "songs" | "artists", ids: string[]): Promise<Set<string>>;

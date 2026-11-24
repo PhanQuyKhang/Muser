@@ -66,6 +66,11 @@ export class CatalogService {
     return song;
   }
 
+  /** Active songs by id, for hydrating lists in other modules. Missing ids are absent. */
+  async getSongsByIds(ids: string[]): Promise<Map<string, Song>> {
+    return new Map((await this.repo.getSongs(ids)).map((s) => [s.id, s]));
+  }
+
   async getArtist(id: string): Promise<{ artist: Artist; songs: Song[] }> {
     const artist = await this.repo.getArtist(id);
     if (!artist) throw new AppError("NOT_FOUND", "Artist not found");

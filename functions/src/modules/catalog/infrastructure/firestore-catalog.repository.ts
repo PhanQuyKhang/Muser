@@ -65,6 +65,13 @@ export class FirestoreCatalogRepository implements CatalogRepository {
     return doc.exists && doc.get("status") === ACTIVE ? toSong(doc) : null;
   }
 
+  async getSongs(ids: string[]): Promise<Song[]> {
+    const unique = [...new Set(ids)];
+    if (unique.length === 0) return [];
+    const docs = await this.db.getAll(...unique.map((id) => this.db.collection("songs").doc(id)));
+    return docs.filter((d) => d.exists && d.get("status") === ACTIVE).map(toSong);
+  }
+
   async getArtist(id: string): Promise<Artist | null> {
     const doc = await this.db.collection("artists").doc(id).get();
     return doc.exists && doc.get("status") === ACTIVE ? toArtist(doc) : null;

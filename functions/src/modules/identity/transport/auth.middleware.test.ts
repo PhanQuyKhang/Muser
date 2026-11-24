@@ -2,6 +2,7 @@ import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { createApp } from "../../../bootstrap/app";
 import type { CatalogService } from "../../catalog/application/catalog.service";
+import type { LibraryService } from "../../library/application/library.service";
 import type { IdentityServices } from "../identity.services";
 import type { TokenVerifier } from "../application/ports/token-verifier";
 
@@ -17,7 +18,7 @@ const identity = {
   getMe: { execute: async () => ({ profile: null, onboardingCompleted: false }) },
   completeOnboarding: {},
 } as unknown as IdentityServices;
-const app = createApp({ verifier, identity, catalog: {} as CatalogService });
+const app = createApp({ verifier, identity, catalog: {} as CatalogService, library: {} as LibraryService });
 
 describe("authentication middleware (fake verifier)", () => {
   it("serves /healthz without authentication", async () => {

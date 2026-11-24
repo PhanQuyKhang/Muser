@@ -134,7 +134,7 @@ Fields: songId:string, likedAt:Timestamp, source:my_explore/friends/search/playl
 
 ### playlists/{playlistId}
 
-Fields: ownerId:string, name:string, description:string/null (Post-MVP / Future; current UI supports playlist name only), coverPath:string/null, createdAt:Timestamp, updatedAt:Timestamp.
+Fields: ownerId:string, name:string, description:string/null (Post-MVP / Future; current UI supports playlist name only), coverPath:string/null, status:active/deleting, createdAt:Timestamp, updatedAt:Timestamp. `status` is "deleting" while a delete is being cleaned up; such playlists are hidden from every read.
 
 All custom playlists are private in current product. No collaboration or playlist-publication feature is implied.
 
@@ -230,7 +230,7 @@ All list operations use limits and cursor pagination, never offsets for long fee
 
 | Screen/use case | Query | Candidate composite index |
 | --- | --- | --- |
-| My playlists | playlists ownerId == uid, order updatedAt desc | ownerId asc, updatedAt desc |
+| My playlists | playlists ownerId == uid, status == active, order updatedAt desc | ownerId asc, status asc, updatedAt desc |
 | Liked latest/oldest | user's likes order likedAt desc/asc | Single-field default |
 | Playlist songs | items order addedAt desc/asc | Single-field default |
 | Catalog songs (paged) | songs status == active, order normalizedTitle, id | status asc, normalizedTitle asc |

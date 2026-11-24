@@ -3,6 +3,7 @@ import request from "supertest";
 import { beforeAll, describe, expect, it } from "vitest";
 import { createApp } from "../../../bootstrap/app";
 import type { CatalogService } from "../../catalog/application/catalog.service";
+import type { LibraryService } from "../../library/application/library.service";
 import type { IdentityServices } from "../identity.services";
 import { FirebaseTokenVerifier } from "../infrastructure/firebase-token-verifier";
 
@@ -30,7 +31,7 @@ describe.skipIf(!host)("authentication against the Auth emulator", () => {
       getMe: { execute: async () => ({ profile: null, onboardingCompleted: false }) },
       completeOnboarding: {},
     } as unknown as IdentityServices;
-    app = createApp({ verifier: new FirebaseTokenVerifier(), identity, catalog: {} as CatalogService });
+    app = createApp({ verifier: new FirebaseTokenVerifier(), identity, catalog: {} as CatalogService, library: {} as LibraryService });
   });
 
   it("accepts a real ID token and returns the token's uid", async () => {

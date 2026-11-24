@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { onRequest } from "firebase-functions/v2/https";
@@ -10,6 +11,12 @@ import { CompleteOnboardingUseCase } from "./modules/identity/application/comple
 import { CreateProfileUseCase } from "./modules/identity/application/create-profile.use-case";
 import { GetMeUseCase } from "./modules/identity/application/get-me.use-case";
 import { FirebaseTokenVerifier } from "./modules/identity/infrastructure/firebase-token-verifier";
+import { LibraryService } from "./modules/library/application/library.service";
+import {
+  FirestoreLibraryQueries,
+  FirestoreLibraryUnitOfWork,
+  FirestorePlaylistCleanup,
+} from "./modules/library/infrastructure/firestore-library";
 import {
   FirestoreIdentityQueries,
   FirestoreIdentityUnitOfWork,
@@ -30,6 +37,18 @@ const identity = {
   getMe: new GetMeUseCase(identityQueries),
 };
 
+const library = new LibraryService({
+  uow: new FirestoreLibraryUnitOfWork(db),
+  queries: new FirestoreLibraryQueries(db),
+  cleanup: new FirestorePlaylistCleanup(db),
+  songs: {
+    getSong: (id) => catalog.getSong(id),
+    getSongsByIds: (ids) => catalog.getSongsByIds(ids),
+  },
+  clock: systemClock,
+  newId: () => randomUUID(),
+});
+
 // NOTE: before the first deploy, set the function region to match the Firestore region
 // (see docs/MUSER_DEPLOYMENT.md). It is intentionally not defaulted here.
-export const api = onRequest(createApp({ verifier: new FirebaseTokenVerifier(), identity, catalog }));
+export const api = onRequest(createApp({ verifier: new FirebaseTokenVerifier(), identity, catalog, library }));

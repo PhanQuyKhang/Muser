@@ -9,15 +9,18 @@ import { profileRouter } from "../modules/identity/transport/profile.controller"
 import type { IdentityServices } from "../modules/identity/identity.services";
 import type { CatalogService } from "../modules/catalog/application/catalog.service";
 import { catalogRouter } from "../modules/catalog/transport/catalog.controller";
+import type { LibraryService } from "../modules/library/application/library.service";
+import { libraryRouter } from "../modules/library/transport/library.controller";
 
 export interface AppDependencies {
   verifier: TokenVerifier;
   identity: IdentityServices;
   catalog: CatalogService;
+  library: LibraryService;
 }
 
 // Composition root: build the HTTP app from injected dependencies.
-export function createApp({ verifier, identity, catalog }: AppDependencies) {
+export function createApp({ verifier, identity, catalog, library }: AppDependencies) {
   const app = express();
   app.disable("x-powered-by");
   app.use(requestContext);
@@ -35,6 +38,7 @@ export function createApp({ verifier, identity, catalog }: AppDependencies) {
     profileRouter(identity.createProfile, identity.checkUsername),
     onboardingRouter(identity.completeOnboarding),
     catalogRouter(catalog),
+    libraryRouter(library),
   );
 
   app.use(notFoundHandler);
