@@ -70,6 +70,13 @@ export class FirestoreCatalogRepository implements CatalogRepository {
     return doc.exists && doc.get("status") === ACTIVE ? toArtist(doc) : null;
   }
 
+  async findActiveIds(collection: "tags" | "songs" | "artists", ids: string[]): Promise<Set<string>> {
+    if (ids.length === 0) return new Set();
+    const refs = ids.map((id) => this.db.collection(collection).doc(id));
+    const docs = await this.db.getAll(...refs, { fieldMask: ["status"] });
+    return new Set(docs.filter((d) => d.exists && d.get("status") === ACTIVE).map((d) => d.id));
+  }
+
   async listActiveForSearch(): Promise<{ songs: Song[]; artists: Artist[] }> {
     const [songs, artists] = await Promise.all([
       this.db.collection("songs").where("status", "==", ACTIVE).get(),

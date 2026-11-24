@@ -73,6 +73,20 @@ export class CatalogService {
     return { artist, songs: page.items };
   }
 
+  /** References that are missing or not active, e.g. ["tag:genre_xyz"]. Empty means all valid. */
+  async findMissingReferences(refs: { tagIds: string[]; songIds: string[]; artistIds: string[] }): Promise<string[]> {
+    const [tags, songs, artists] = await Promise.all([
+      this.repo.findActiveIds("tags", refs.tagIds),
+      this.repo.findActiveIds("songs", refs.songIds),
+      this.repo.findActiveIds("artists", refs.artistIds),
+    ]);
+    return [
+      ...refs.tagIds.filter((id) => !tags.has(id)).map((id) => `tag:${id}`),
+      ...refs.songIds.filter((id) => !songs.has(id)).map((id) => `song:${id}`),
+      ...refs.artistIds.filter((id) => !artists.has(id)).map((id) => `artist:${id}`),
+    ];
+  }
+
   /** Substring search over the cached active catalog; prefix matches rank first. */
   async search(query: string): Promise<{ songs: Song[]; artists: Artist[] }> {
     const q = normalizeText(query);

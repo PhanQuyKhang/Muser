@@ -3,6 +3,7 @@ import request from "supertest";
 import { beforeAll, describe, expect, it } from "vitest";
 import { createApp } from "../../../bootstrap/app";
 import type { CatalogService } from "../../catalog/application/catalog.service";
+import type { IdentityServices } from "../identity.services";
 import { FirebaseTokenVerifier } from "../infrastructure/firebase-token-verifier";
 
 // Runs against the Firebase Auth EMULATOR with real (emulator-issued) ID tokens.
@@ -25,7 +26,11 @@ describe.skipIf(!host)("authentication against the Auth emulator", () => {
   beforeAll(() => {
     initializeApp({ projectId: "demo-muser" });
     // Only authentication is exercised here, so the catalog is never called.
-    app = createApp({ verifier: new FirebaseTokenVerifier(), catalog: {} as CatalogService });
+    const identity = {
+      getMe: { execute: async () => ({ profile: null, onboardingCompleted: false }) },
+      completeOnboarding: {},
+    } as unknown as IdentityServices;
+    app = createApp({ verifier: new FirebaseTokenVerifier(), identity, catalog: {} as CatalogService });
   });
 
   it("accepts a real ID token and returns the token's uid", async () => {

@@ -74,7 +74,8 @@ cd scripts/seed && npm run seed
 - Provider: Firebase Authentication, email and password (MUSER_FEATURES.md). Enable the Email/Password provider in each Firebase project's console; this cannot be done from the repo.
 - Backend: `functions/src/modules/identity` verifies the Firebase ID token on every `/v1` route and sets the caller from the verified `uid`. Request body, query and params are never trusted for identity. All rejections return the same `UNAUTHENTICATED` 401.
 - Tests: `cd functions && npm test` starts the Auth emulator, signs up emulator users, and checks real ID tokens (valid, garbage, tampered). `npm run test:unit` runs the fake-verifier tests without the emulator.
-- Not done yet: onboarding/username reservation, admin claim for catalog import, App Check, real password-reset emails (the emulator does not send them), and function region selection.
+- Setup flow: `POST /v1/me/profile` (S05) reserves the username and creates `profiles/{uid}` in one transaction; `POST /v1/onboarding` (S09) then writes `users/{uid}` (requires the profile); replays of either are no-ops. `GET /v1/me` returns `hasProfile` and `onboardingCompleted` so the app can resume an unfinished setup at S05 or S06. `GET /v1/usernames/:username/available` is an advisory check while typing. Bounds not fixed by the product docs: at most 20 seed tags, 5 songs, 10 artists; default discovery level `explore`.
+- Not done yet: admin claim for catalog import, App Check, real password-reset emails (the emulator does not send them), and function region selection.
 
 ## 8. Known gaps
 

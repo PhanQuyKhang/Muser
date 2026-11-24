@@ -3,6 +3,7 @@ import { getFirestore, type Firestore } from "firebase-admin/firestore";
 import request from "supertest";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp } from "../../../bootstrap/app";
+import type { IdentityServices } from "../../identity/identity.services";
 import { CatalogService } from "../application/catalog.service";
 import { FirestoreCatalogRepository } from "./firestore-catalog.repository";
 
@@ -85,6 +86,7 @@ describe.skipIf(!host)("catalog against the Firestore emulator", () => {
   it("serves the full API from Firestore without leaking storage paths", async () => {
     const app = createApp({
       verifier: { verify: async () => ({ uid: "alice" }) },
+      identity: {} as IdentityServices, // not used by catalog routes
       catalog: new CatalogService(repo, { now: () => new Date() }),
     });
     const res = await request(app).get("/v1/catalog/songs?limit=3").set("Authorization", "Bearer x");
@@ -102,6 +104,7 @@ describe.skipIf(!host)("catalog against the Firestore emulator", () => {
   const makeApp = () =>
     createApp({
       verifier: { verify: async (t: string) => (t === "t" ? { uid: "alice" } : Promise.reject(new Error("bad"))) },
+      identity: {} as IdentityServices, // not used by catalog routes
       catalog: new CatalogService(repo, { now: () => new Date() }),
     });
   const ids = (items: { id: string }[]) => items.map((i) => i.id);

@@ -251,7 +251,8 @@ These are proposed app API operations, not existing Firebase REST endpoints. Imp
 
 | Operation | Input | Result / atomic work |
 | --- | --- | --- |
-| completeOnboarding | username, displayName, seeds, sharing choice | Reserve username (if not already reserved during S05), commit seed choices, and set onboardingCompletedAt to finalize setup. Unfinished onboarding (onboardingCompletedAt == null) resumes at S06–S09. |
+| createProfile (S05) | username, displayName | Reserve the username and create the profile in one transaction. Replay is a no-op; the username cannot change afterwards. |
+| completeOnboarding (S09) | seeds, sharing choice | Requires the profile; commit seed choices, and set onboardingCompletedAt to finalize setup. Unfinished onboarding (onboardingCompletedAt == null) resumes at S06–S09. |
 | setSharing | enabled | Transaction on setting + epoch |
 | likeSong | songId, source, sourceShareId? | Create like once; eligible share in same transaction |
 | unlikeSong | songId | Delete like + deactivate linked share |
@@ -262,7 +263,7 @@ These are proposed app API operations, not existing Firebase REST endpoints. Imp
 | sendHeart | shareId, requestId | Create immutable reaction + one Activity row atomically |
 | getRecommendations | level, limit, cursor? | Song candidates with ranking |
 
-Suggested stable errors: UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, VALIDATION_ERROR, INVALID_STATE, ALREADY_SENT, RATE_LIMITED, UNAVAILABLE. An already completed retry should return the existing result, not send another heart. For repeated-heart future mode, requestId must be persisted as the idempotency key.
+Suggested stable errors: UNAUTHENTICATED, FORBIDDEN, NOT_FOUND, VALIDATION_ERROR, INVALID_STATE, USERNAME_TAKEN, ALREADY_SENT, RATE_LIMITED, UNAVAILABLE. An already completed retry should return the existing result, not send another heart. For repeated-heart future mode, requestId must be persisted as the idempotency key.
 
 Race handling: sendHeart reads the same friendship, share, like and owner settings documents inside its transaction, so concurrent privacy/unfriend/unlike changes invalidate/retry the operation. Validation outside a transaction alone is insufficient. If the reaction commits first, it is historical activity and is not recalled.
 

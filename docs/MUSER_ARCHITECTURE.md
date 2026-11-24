@@ -302,7 +302,10 @@ Version business API under /v1; publish OpenAPI contracts with input/output sche
 
 | Method and route | Purpose |
 | --- | --- |
-| POST /v1/onboarding | Reserve username and complete profile/settings |
+| POST /v1/me/profile | S05: reserve username and create the profile in one transaction (replay is a no-op; username is read-only afterwards) |
+| GET /v1/usernames/:username/available | Advisory availability check while typing; the transaction above decides |
+| POST /v1/onboarding | S09: save taste seeds and the sharing choice, set onboardingCompletedAt. Requires the profile |
+| GET /v1/me | Verified caller plus `hasProfile` / `onboardingCompleted` for setup routing |
 | GET /v1/catalog/tags | Active genre/mood tags; optional `category` filter |
 | GET /v1/catalog/songs | Paged catalog; `limit` (max 50), `cursor`, and one of `tagId` / `artistId` |
 | GET /v1/catalog/songs/:songId | One active song (no storage path or rights data) |
