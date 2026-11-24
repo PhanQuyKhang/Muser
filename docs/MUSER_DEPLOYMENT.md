@@ -62,7 +62,21 @@ cd scripts/seed && npm run seed
 7. Configure monitoring, cost alerts and backup/restore exercises.
 8. Run the rules tests and smoke tests against staging before promoting.
 
-## 6. Known gaps
+## 6. Deploy tooling
+
+- `.firebaserc` maps `dev`, `staging` and `prod` to project IDs. They are `REPLACE_WITH_*` placeholders until you create the projects; the deploy script refuses to run while a placeholder remains.
+- `npm run deploy:prod` (repo root) runs the rules tests, then deploys **only** Firestore rules, indexes and Storage rules to the `prod` alias. It never writes data. `--dry-run` shows the command without deploying.
+- `.github/workflows/firebase.yml` runs the rules tests and the seed validation on pull requests. A manual `workflow_dispatch` deploys to staging or prod using keyless Workload Identity Federation. Create GitHub Environments named `staging` and `prod` with required reviewers, and set these variables on each: `FIREBASE_PROJECT_ID`, `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_DEPLOY_SERVICE_ACCOUNT`.
+- Reference data is seeded separately and deliberately: `cd scripts/seed && npm run seed -- --env=prod --project=<prod-id> --only=reference --yes`.
+
+## 7. Authentication
+
+- Provider: Firebase Authentication, email and password (MUSER_FEATURES.md). Enable the Email/Password provider in each Firebase project's console; this cannot be done from the repo.
+- Backend: `functions/src/modules/identity` verifies the Firebase ID token on every `/v1` route and sets the caller from the verified `uid`. Request body, query and params are never trusted for identity. All rejections return the same `UNAUTHENTICATED` 401.
+- Tests: `cd functions && npm test` starts the Auth emulator, signs up emulator users, and checks real ID tokens (valid, garbage, tampered). `npm run test:unit` runs the fake-verifier tests without the emulator.
+- Not done yet: onboarding/username reservation, admin claim for catalog import, App Check, real password-reset emails (the emulator does not send them), and function region selection.
+
+## 8. Known gaps
 
 - Backend API, mobile app and the approved catalog import are not part of this change.
 - Catalog data still lives in `scripts/seed/src/catalog.ts`; moving it to validated JSON for the import pipeline is a later step.

@@ -1,0 +1,12 @@
+{
+  "name": "muser",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Repo-level helper scripts for the Muser Firebase backing store.",
+  "scripts": {
+    "test:rules": "npm --prefix firebase/tests test",
+    "deploy:dev": "node scripts/deploy/deploy.mjs dev",
+    "deploy:staging": "node scripts/deploy/deploy.mjs staging --yes",
+    "deploy:prod": "node scripts/deploy/deploy.mjs prod --yes"
+  }
+}
