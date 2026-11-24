@@ -236,6 +236,8 @@ All list operations use limits and cursor pagination, never offsets for long fee
 | Catalog songs (paged) | songs status == active, order normalizedTitle, id | status asc, normalizedTitle asc |
 | Songs by tag | songs tagIds array-contains id, status == active, order normalizedTitle, id | tagIds array, status asc, normalizedTitle asc |
 | Artist page / songs by artist | songs artistIds array-contains id, status == active, order normalizedTitle, id | artistIds array, status asc, normalizedTitle asc |
+| Browse artists | artists status == active, order normalizedName, id | status asc, normalizedName asc |
+| Artists by tag | artists tagIds array-contains id, status == active, order normalizedName, id | tagIds array, status asc, normalizedName asc |
 | Friends | friendships memberIds array-contains uid, status == accepted, order updatedAt desc | memberIds array, status asc, updatedAt desc |
 | Incoming requests | recipientId == uid, status == pending, order requestedAt desc | recipientId asc, status asc, requestedAt desc |
 | Outgoing requests | requesterId == uid, status == pending, order requestedAt desc | requesterId asc, status asc, requestedAt desc |

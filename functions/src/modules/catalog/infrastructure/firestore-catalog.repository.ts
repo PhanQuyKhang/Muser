@@ -1,5 +1,11 @@
 import { FieldPath, type Firestore, type Query, type QueryDocumentSnapshot, type DocumentData } from "firebase-admin/firestore";
-import type { CatalogRepository, SongPage, SongQuery } from "../application/ports/catalog-repository";
+import type {
+  ArtistPage,
+  ArtistQuery,
+  CatalogRepository,
+  SongPage,
+  SongQuery,
+} from "../application/ports/catalog-repository";
 import type { Artist, Song, Tag } from "../domain/catalog";
 
 const ACTIVE = "active";
@@ -63,6 +69,22 @@ export class FirestoreCatalogRepository implements CatalogRepository {
   async getSong(id: string): Promise<Song | null> {
     const doc = await this.db.collection("songs").doc(id).get();
     return doc.exists && doc.get("status") === ACTIVE ? toSong(doc) : null;
+  }
+
+  async listArtists(query: ArtistQuery): Promise<ArtistPage> {
+    let q: Query = this.db.collection("artists").where("status", "==", ACTIVE);
+    // Needs the composite indexes in firebase/firestore.indexes.json (the emulator does not enforce them).
+    if (query.tagId) q = q.where("tagIds", "array-contains", query.tagId);
+    q = q.orderBy("normalizedName").orderBy(FieldPath.documentId());
+    if (query.after) q = q.startAfter(query.after.sortKey, query.after.id);
+
+    const snap = await q.limit(query.limit + 1).get();
+    const pageDocs = snap.docs.slice(0, query.limit);
+    const last = pageDocs[pageDocs.length - 1];
+    return {
+      items: pageDocs.map(toArtist),
+      next: snap.docs.length > query.limit && last ? { sortKey: last.get("normalizedName"), id: last.id } : null,
+    };
   }
 
   async getSongs(ids: string[]): Promise<Song[]> {

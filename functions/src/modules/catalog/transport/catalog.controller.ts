@@ -14,6 +14,11 @@ const songsQuery = z.object({
   tagId: idSchema.optional(),
   artistId: idSchema.optional(),
 });
+const artistsQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  cursor: z.string().max(512).optional(),
+  tagId: idSchema.optional(),
+});
 const songParams = z.object({ songId: idSchema });
 const artistParams = z.object({ artistId: idSchema });
 const searchQuery = z.object({ q: z.string().trim().min(1).max(100) });
@@ -38,6 +43,12 @@ export function catalogRouter(catalog: CatalogService): Router {
   router.get("/catalog/songs/:songId", async (req, res) => {
     const { songId } = parse(songParams, req.params);
     res.json({ song: toSongDto(await catalog.getSong(songId)), requestId: req.requestId });
+  });
+
+  router.get("/catalog/artists", async (req, res) => {
+    const query = parse(artistsQuery, req.query);
+    const page = await catalog.listArtists(query);
+    res.json({ items: page.items.map(toArtistDto), nextCursor: page.nextCursor, requestId: req.requestId });
   });
 
   router.get("/artists/:artistId", async (req, res) => {

@@ -66,6 +66,20 @@ export class CatalogService {
     return song;
   }
 
+  /** Browse artists A-Z (e.g. onboarding S08), optionally only those tagged with `tagId`. */
+  async listArtists(input: {
+    limit: number;
+    cursor?: string;
+    tagId?: string;
+  }): Promise<{ items: Artist[]; nextCursor: string | null }> {
+    const page = await this.repo.listArtists({
+      limit: input.limit,
+      after: input.cursor ? decodeCursor(input.cursor) : undefined,
+      tagId: input.tagId,
+    });
+    return { items: page.items, nextCursor: page.next ? encodeCursor(page.next) : null };
+  }
+
   /** Active songs by id, for hydrating lists in other modules. Missing ids are absent. */
   async getSongsByIds(ids: string[]): Promise<Map<string, Song>> {
     return new Map((await this.repo.getSongs(ids)).map((s) => [s.id, s]));

@@ -46,6 +46,9 @@ describe.skipIf(!host)("catalog against the Firestore emulator", () => {
     await db.doc("tags/mood_old").set({ label: "Old", category: "mood", status: "archived" });
     await db.doc("artists/artist_a").set({ name: "Alpha Band", normalizedName: "alpha band", tagIds: [], status: "active" });
     await db.doc("artists/artist_gone").set({ name: "Gone", normalizedName: "gone", tagIds: [], status: "archived" });
+    await db.doc("artists/artist_b").set({ name: "Beta Trio", normalizedName: "beta trio", imagePath: "catalog/artists/artist_b/v1.jpg", tagIds: ["genre_pop"], status: "active" });
+    await db.doc("artists/artist_c").set({ name: "Cobalt", normalizedName: "cobalt", tagIds: ["genre_pop", "mood_chill"], status: "active" });
+    await db.doc("artists/artist_d").set({ name: "Cobalt", normalizedName: "cobalt", tagIds: [], status: "active" }); // same name: id breaks the tie
     await db.doc("songs/s_a").set(songDoc("Apple", { popularityRank: 7 }));
     await db.doc("songs/s_b").set(songDoc("Banana", { tagIds: ["mood_chill"], artistIds: ["artist_b"], artistNames: ["Beta"] }));
     await db.doc("songs/s_c").set(songDoc("Cherry"));
@@ -114,7 +117,7 @@ describe.skipIf(!host)("catalog against the Firestore emulator", () => {
 
   it("requires authentication on every catalog route", async () => {
     const app = makeApp();
-    for (const path of ["/v1/catalog/tags", "/v1/catalog/songs", "/v1/catalog/songs/s_a", "/v1/artists/artist_a", "/v1/search?q=a"]) {
+    for (const path of ["/v1/catalog/tags", "/v1/catalog/songs", "/v1/catalog/songs/s_a", "/v1/catalog/artists", "/v1/artists/artist_a", "/v1/search?q=a"]) {
       expect((await request(app).get(path)).status).toBe(401);
     }
   });
@@ -177,5 +180,44 @@ describe.skipIf(!host)("catalog against the Firestore emulator", () => {
     await request(app).get("/v1/search?q=banana").set(AUTH);
     expect(spy).toHaveBeenCalledTimes(1);
     spy.mockRestore();
+  });
+
+  // ---- Browse artists (e.g. onboarding S08) ----
+
+  it("pages artists A-Z deterministically (identical names tie-broken by id), hiding archived ones", async () => {
+    const app = makeApp();
+    const seen: string[] = [];
+    let cursor: string | null = null;
+    for (let guard = 0; guard < 10; guard++) {
+      const res = await request(app).get(`/v1/catalog/artists?limit=2${cursor ? `&cursor=${cursor}` : ""}`).set(AUTH);
+      expect(res.status).toBe(200);
+      seen.push(...ids(res.body.items));
+      cursor = res.body.nextCursor;
+      if (!cursor) break;
+    }
+    expect(seen).toEqual(["artist_a", "artist_b", "artist_c", "artist_d"]);
+    expect(seen).not.toContain("artist_gone");
+  });
+
+  it("filters artists by tag and returns only public fields", async () => {
+    const app = makeApp();
+    const res = await request(app).get("/v1/catalog/artists?tagId=genre_pop").set(AUTH);
+    expect(ids(res.body.items)).toEqual(["artist_b", "artist_c"]);
+    expect(res.body.items[0]).toEqual({
+      id: "artist_b",
+      name: "Beta Trio",
+      imagePath: "catalog/artists/artist_b/v1.jpg",
+      tagIds: ["genre_pop"],
+    });
+    expect(ids((await request(app).get("/v1/catalog/artists?tagId=nope").set(AUTH)).body.items)).toEqual([]);
+  });
+
+  it("validates artist list parameters", async () => {
+    const app = makeApp();
+    for (const q of ["limit=0", "limit=51", "limit=abc", "cursor=%%%", "cursor=bm90LWpzb24", "tagId=a%2Fb"]) {
+      const res = await request(app).get(`/v1/catalog/artists?${q}`).set(AUTH);
+      expect(res.status, q).toBe(400);
+      expect(res.body.error.code).toBe("VALIDATION_ERROR");
+    }
   });
 });
