@@ -1,0 +1,81 @@
+/** User-facing English copy. Screens import from here instead of inlining strings. */
+export const strings = {
+  common: {
+    retry: "Retry",
+    cancel: "Cancel",
+    continue: "Continue",
+    back: "Back",
+    skip: "Skip",
+    save: "Save",
+    signOut: "Sign out",
+    connectionError: "Couldn't connect. Please try again.",
+  },
+  opening: {
+    tagline: "Find your next favorite.",
+    loading: "Loading Muser",
+  },
+  auth: {
+    fields: {
+      email: "Email",
+      emailPlaceholder: "you@example.com",
+      password: "Password",
+      passwordPlaceholder: "Enter your password",
+      newPasswordPlaceholder: "Create a password",
+      confirmPassword: "Confirm password",
+      confirmPlaceholder: "Enter it again",
+      passwordHelper: "At least 8 characters.",
+    },
+    login: {
+      eyebrow: "LET THE GOOD MUSIC IN",
+      title: "Welcome back.",
+      description: "Your next favorite is waiting.",
+      forgot: "Forgot password?",
+      submit: "Log in",
+      footerCopy: "New here?",
+      footerLink: "Create account",
+    },
+    signUp: {
+      eyebrow: "MAKE ROOM FOR NEW FAVORITES",
+      title: "Your next favorite\nstarts here.",
+      description: "Create an account. Find your sound.",
+      submit: "Create account",
+      footerCopy: "Already have an account?",
+      footerLink: "Log in",
+    },
+    reset: {
+      eyebrow: "GET BACK TO YOUR MUSIC",
+      title: "Forgot your\npassword?",
+      description: "Enter the email linked to your account.\nWe'll send you a reset link.",
+      submit: "Send reset link",
+      footerCopy: "Remembered it?",
+      footerLink: "Back to log in",
+    },
+    resetSent: {
+      title: "Check your inbox.",
+      description: (email: string) =>
+        `If an account exists for ${email},\nyou'll receive a password reset link.`,
+      action: "Back to log in",
+      help: "Check your spam folder if it hasn't arrived.",
+    },
+    validation: {
+      emailRequired: "Enter your email.",
+      emailInvalid: "Enter a valid email address.",
+      passwordRequired: "Enter your password.",
+      passwordTooShort: "Use at least 8 characters.",
+      confirmRequired: "Enter your password again.",
+      confirmMismatch: "Passwords don't match.",
+    },
+    errors: {
+      invalidCredentials: "Email or password is incorrect.",
+      emailInUse: "An account with this email already exists.",
+      weakPassword: "Use at least 8 characters.",
+      invalidEmail: "Enter a valid email address.",
+      tooManyRequests: "Too many attempts. Try again later.",
+      network: "Couldn't connect. Please try again.",
+      unknown: "Something went wrong. Please try again.",
+    },
+  },
+  placeholder: {
+    comingSoon: "This screen is coming soon.",
+  },
+} as const;
