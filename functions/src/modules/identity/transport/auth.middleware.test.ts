@@ -1,6 +1,7 @@
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { createApp } from "../../../bootstrap/app";
+import type { CatalogService } from "../../catalog/application/catalog.service";
 import type { TokenVerifier } from "../application/ports/token-verifier";
 
 // Fake verifier: only "good-token" is valid and maps to uid "alice".
@@ -10,7 +11,8 @@ const verifier: TokenVerifier = {
     throw new Error("bad token");
   },
 };
-const app = createApp({ verifier });
+// These tests only exercise authentication, so the catalog is never called.
+const app = createApp({ verifier, catalog: {} as CatalogService });
 
 describe("authentication middleware (fake verifier)", () => {
   it("serves /healthz without authentication", async () => {

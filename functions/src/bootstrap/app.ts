@@ -4,13 +4,16 @@ import { requestContext } from "../shared/request-context";
 import type { TokenVerifier } from "../modules/identity/application/ports/token-verifier";
 import { authenticate } from "../modules/identity/transport/auth.middleware";
 import { meRouter } from "../modules/identity/transport/me.controller";
+import type { CatalogService } from "../modules/catalog/application/catalog.service";
+import { catalogRouter } from "../modules/catalog/transport/catalog.controller";
 
 export interface AppDependencies {
   verifier: TokenVerifier;
+  catalog: CatalogService;
 }
 
 // Composition root: build the HTTP app from injected dependencies.
-export function createApp({ verifier }: AppDependencies) {
+export function createApp({ verifier, catalog }: AppDependencies) {
   const app = express();
   app.disable("x-powered-by");
   app.use(requestContext);
@@ -21,7 +24,7 @@ export function createApp({ verifier }: AppDependencies) {
   });
 
   // Everything under /v1 requires a verified Firebase ID token.
-  app.use("/v1", authenticate(verifier), meRouter());
+  app.use("/v1", authenticate(verifier), meRouter(), catalogRouter(catalog));
 
   app.use(notFoundHandler);
   app.use(errorHandler);

@@ -303,7 +303,9 @@ Version business API under /v1; publish OpenAPI contracts with input/output sche
 | Method and route | Purpose |
 | --- | --- |
 | POST /v1/onboarding | Reserve username and complete profile/settings |
-| GET /v1/catalog/songs | Paged catalog with supported filters |
+| GET /v1/catalog/tags | Active genre/mood tags; optional `category` filter |
+| GET /v1/catalog/songs | Paged catalog; `limit` (max 50), `cursor`, and one of `tagId` / `artistId` |
+| GET /v1/catalog/songs/:songId | One active song (no storage path or rights data) |
 | GET /v1/artists/:id | Artist details and songs |
 | GET /v1/search | Catalog search; cached filtering is adequate for initial catalog |
 | GET /v1/me/likes | Liked library |
