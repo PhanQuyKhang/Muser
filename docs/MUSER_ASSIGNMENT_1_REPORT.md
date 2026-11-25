@@ -164,8 +164,8 @@ Every NFR below has a number and a way to check it, so it can be accepted in Ass
 | NFR-PLAT-02 | Screen sizes | Portrait phones, 360 to 430 pt wide | No clipped text or horizontal scroll; reference frame 390 × 844 | Device + emulator checks |
 | NFR-BAT-01 | Battery | No polling | Data fetched on screen focus or pull-to-refresh; the only listener is the owner's Activity | Code review |
 | NFR-NET-01 | Network | Bounded payloads | List endpoints paged, max 50 items per page | API tests |
-| NFR-NET-02 | Network | Expired token handled | One forced token refresh and retry on 401, then sign-in prompt | Unit test of api client |
-| NFR-A11Y-01 | Accessibility | Touch targets and labels | ≥ 48 px targets; accessibilityLabel on every icon-only button | Lint review, screen reader pass |
+| NFR-NET-02 | Network | Expired token handled | One forced token refresh and retry on 401, then the request fails with an error and Retry (redirect to Log in is not built) | Unit test of api client |
+| NFR-A11Y-01 | Accessibility | Touch targets and labels | ≥ 48 px targets (≥ 44 px for mood pills, as in Figma); accessibilityLabel on every icon-only button | Lint review, screen reader pass |
 | NFR-A11Y-02 | Accessibility | Contrast | WCAG AA: 4.5:1 text, 3:1 large text and controls | Contrast checker on tokens |
 | NFR-A11Y-03 | Accessibility | Text scaling and motion | System font scaling works without clipping; reduced motion respected | Device setting test |
 | NFR-MAINT-01 | Maintainability | Quality gate per commit | typecheck, lint and tests pass; one feature per commit | CI for backend, local gate for app |
@@ -186,7 +186,7 @@ Muser is a layered Expo (React Native) app talking to one modular Express API on
 One Express app is exported as the `api` Cloud Function. Each module (identity, catalog, library today; social, sharing, reactions, recommendation, media next) has four layers:
 
 - **transport**: routers, zod request schemas, response DTOs with ISO timestamps.
-- **application**: use cases and ports (repository and unit-of-work interfaces).
+- **application**: ports (repository and unit-of-work interfaces).
 - **domain**: pure models and policies, with no Firebase import and no HTTP codes.
 - **infrastructure**: Firestore implementations of the ports.
 
@@ -202,7 +202,7 @@ Dependency direction: routes → feature screens → feature hooks (view models)
 | --- | --- | --- |
 | View | `src/app/` routes, `features/*/screens` | Expo Router files re-export screens; screens only compose UI |
 | ViewModel | `features/*/hooks` | TanStack Query queries and mutations, form state, loading/empty/error |
-| Application | `src/application/` | `Services` context, session store (Zustand), use cases |
+| Application | `src/application/` | `Services` context, session store (Zustand), cache helper |
 | Domain | `src/domain/` | Models, repository interfaces, pure validation |
 | Data | `src/data/` | API client (token, one retry on 401, ApiError), repositories, Firebase Auth adapter |
 | Shared | `src/shared/` | Theme tokens, generic UI, strings, typed config |
@@ -273,7 +273,7 @@ Storage paths: `catalog/audio/{songId}/{v}.mp3`, `catalog/covers/{id}/{v}.jpg`, 
 | Auth session and ID token | Firebase Auth SDK persistence | Until sign-out | Yes |
 | Catalog metadata (50–100 songs) | TanStack Query cache | Session; refetched on focus; also saved on the device if NFR-OFF-01 (Should) is built | Yes |
 | Liked, playlists, friend feed | TanStack Query cache | Invalidated after each write | Yes |
-| Onboarding draft | Zustand store bound to uid (`claim(uid)`) | Until onboarding completes | Yes, and on uid change |
+| Onboarding draft | Zustand store bound to uid (`claim(uid)`) | Until onboarding completes | No; reset when a different user starts onboarding (uid change) |
 | Player queue and position | Zustand player store | Session | Yes, playback stops |
 | Audio bytes | Streaming buffer only | Not persisted | n/a |
 
@@ -285,16 +285,16 @@ All routes are under `/v1` and need `Authorization: Bearer <Firebase ID token>`.
 
 | Method and route | Request | Success response | Main errors | Status |
 | --- | --- | --- | --- | --- |
-| GET /v1/me | none | 200 { uid, hasProfile, onboardingCompleted } | 401 | Built |
+| GET /v1/me | none | 200 { uid, email, profile, hasProfile, onboardingCompleted } | 401 | Built |
 | GET /v1/usernames/:username/available | path username | 200 { available } | 400 | Built |
 | POST /v1/me/profile | { username, displayName } | 201 profile | 400, 409 USERNAME\_TAKEN | Built |
-| POST /v1/onboarding | { seedTagIds, seedSongIds ≤ 5, seedArtistIds, sharingEnabled } | 200 | 400, 409 INVALID\_STATE (no profile) | Built |
+| POST /v1/onboarding | { seedTagIds, seedSongIds ≤ 5, seedArtistIds, sharingEnabled } | 201 first time, 200 on replay | 400, 409 INVALID\_STATE (no profile) | Built |
 | GET /v1/catalog/tags | ?category | 200 { items } | 401 | Built |
 | GET /v1/catalog/songs | ?limit, cursor, tagId or artistId | 200 { items, nextCursor } | 400 | Built |
 | GET /v1/catalog/songs/:songId | path | 200 song | 404 | Built |
 | GET /v1/catalog/artists | ?limit, cursor, tagId (also GET /v1/artists/:artistId for one artist and songs; GET /v1/search?q= for catalog search) | 200 { items, nextCursor } | 400 | Built |
 | GET /v1/me/likes | ?cursor, sort | 200 { items, nextCursor } | 401 | Built |
-| PUT /v1/me/likes/:songId | { source, sourceShareId? } | 200 { liked, shared } | 404 song | Built (share step pending) |
+| PUT /v1/me/likes/:songId | { source, sourceShareId? } | 201 new like, 200 already liked: { songId, likedAt, source } | 404 song | Built (share step pending) |
 | DELETE /v1/me/likes/:songId | none | 204 | 404 | Built |
 | POST /v1/playlists | { name } | 201 playlist | 400 | Built |
 | GET /v1/playlists, /:id, /:id/items | ?sort=newest\|oldest, cursor | 200 | 404 (not owner) | Built |
@@ -409,7 +409,7 @@ After setup (S01–S09), every screen and overlay in 6.2 is reachable from one o
 
 ### 6.5 Accessibility
 
-- Touch targets at least 48 px; every icon-only button has an accessibility label.
+- Touch targets at least 48 px (mood pills 44 px, as in Figma); every icon-only button has an accessibility label.
 - Every swipe has a button alternative (Like, Skip), so the app works with a screen reader.
 - Contrast target WCAG AA: 4.5:1 for text, 3:1 for large text and control graphics. State is shown by colour plus text, icon or shape, never colour alone.
 - System text scaling is supported; long titles truncate in rows and wrap in the full player.
