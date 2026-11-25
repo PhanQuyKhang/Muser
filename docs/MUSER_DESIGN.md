@@ -301,7 +301,7 @@ Header: “Explore”, followed by subtabs **My Explore** and **My Friends**. Th
 | --- | --- |
 | Right swipe / heart on a new song | Add to Liked; share as the current user if sharing is enabled |
 | Left swipe / skip | Advance without permanently disliking or blocking the song |
-| Right swipe on an already liked song | Keep the existing like; do not duplicate or republish an old private like |
+| Right swipe on an already liked song | Keep the existing like; do not duplicate or republish an old like |
 | Cancelled/short drag | Return the current card to its original position |
 
 - Right swipes in My Friends use the same sharing rule as My Explore. They create the current user's share, not a copy of another person's post.
@@ -359,7 +359,7 @@ Never label a normal user's action “Delete song” if it only removes a person
 - Tap a song to play; show the common mini player.
 - “Add to playlist” chooses a personal playlist; an explicit heart action can add to Liked.
 - Adding to a personal playlist does not implicitly like or share the song.
-- Explicit likes from Search or a player add to Liked privately; automatic sharing is triggered by new right swipes/heart actions on Explore cards only. Use clear action labels rather than assuming every save publishes.
+- A like from Search or a player is the same action as a like on Explore: it adds the song to Liked and, if sharing is enabled, shares it. Label the heart consistently and keep the sharing status visible.
 - Global search and playlist-local search must have distinct placeholders: “Search songs or artists” vs “Search this playlist”.
 
 ### 9.8 Full player
@@ -398,14 +398,14 @@ This tab manages relationships. Music discovery through friends lives under **Ex
 
 ## 9A. Sharing and ownership rules
 
-- Private data: email, listening history, onboarding preferences, personal playlists, and private likes.
+- Private data: email, listening history, onboarding preferences, personal playlists, and likes made while sharing is off.
 - Friend-visible data: shares created while opted in, with limited profile attribution.
 - Share scope: accepted friends only, not public users.
 - Turning sharing off hides and clears prior share eligibility without removing Liked membership.
 - Turning sharing back on shares only new qualifying likes; it does not republish old likes.
 - Unliking removes the user's share; removing a personal playlist membership does not.
 - Use one underlying like per user/song and separate playlist memberships; do not infer sharing from playlist presence alone.
-- Non-Explore saves are private by default as specified above. Returning to an already liked song in Explore does not silently publish it.
+- Likes from any screen behave the same: with sharing on, a new like is also shared. Liking an already liked song does not publish it again.
 
 ## 9B. Detailed Figma screen inventory
 
@@ -487,7 +487,7 @@ Combine representative states where sensible and use component variants rather t
 | Playlist creation | S12 → O02 → new S14; reuse O03 for adding tracks and creating a playlist from that context. |
 | Organize music | S13/S14 → O05/O03 → add elsewhere; remove only the current membership or explicitly unlike via O08. |
 | Playlist playback | S13/S14 → tap track → mini player → S16 → collapse; show local search and O04 sort. |
-| Global discovery by search | S15 → query → results → play/S16 or O03; saves here do not silently publish. |
+| Global discovery by search | S15 → query → results → play/S16 or O03; a like here is shared like any other when sharing is on. |
 | Friendship | S17 → S18 → request sent; outgoing pending request in S19 can be cancelled; recipient S19 → Accept → S17; remove via O09; shared music becomes available in S11 only for accepted friends. |
 | Profile editing | S20 → S21 → device picker placeholder → O10 → Save → updated S20. |
 | Activity feed | S20 → S24 → view incoming heart reactions and revoked share fallback. |

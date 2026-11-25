@@ -125,8 +125,8 @@ Store Storage object paths, not expiring signed URLs. Playback resolves an autho
 Fields: songId:string, likedAt:Timestamp, source:my_explore/friends/search/playlist, sourceShareId:string/null, activeShareId:string/null.
 
 - Document existence means liked; song ID prevents duplicate membership.
-- An eligible new Like (not already in likes) created by swiping right / liking from either My Explore or My Friends atomically creates a new active share owned by the current user under their current shareEpoch (when sharingEnabled == true), never copying or forwarding the friend's share record.
-- Likes from Search, Playlist, or Full Player remain private by default (no automatic share creation).
+- Like and share are one behavior. A new Like (not already in likes) from any screen (My Explore, My Friends, Search, a playlist or the Full Player) atomically creates a new active share owned by the current user under their current shareEpoch when sharingEnabled == true, never copying or forwarding the friend's share record.
+- When sharingEnabled == false the like is created without a share, so it stays visible only to its owner.
 - A heart reaction on My Friends sends an Activity event only and never adds a like or creates a share.
 - Saving an already-liked song is a no-op: do not change likedAt or create a new share.
 - Unlike deletes this membership and marks any active share inactive in one transaction. It does not remove custom playlist memberships or past reactions.
@@ -170,7 +170,7 @@ Fields: memberIds:string[2], requesterId:string, recipientId:string, status:pend
 
 Fields: ownerId:string, songId:string, sharedAt:Timestamp, epoch:integer, active:boolean, deactivatedAt:Timestamp/null, deactivationReason:unliked/owner_deleted/null.
 
-A new share is created only by an eligible new like from either My Explore or My Friends while sharing is enabled. It is owned by the current user under their current shareEpoch and does not copy or forward a friend's share record. sharedAt belongs to this event; it is not a song-level or playlist-level field.
+A new share is created only together with a new like, from any screen, while sharing is enabled. It is owned by the current user under their current shareEpoch and does not copy or forward a friend's share record. sharedAt belongs to this event; it is not a song-level or playlist-level field.
 
 Backend may return a share only when ALL are true:
 

@@ -50,9 +50,9 @@ The Explore screen serves as the default landing view after login, featuring two
 
 ### 4.1. Subtab: "My Explore" (Personalized Recommendations)
 - Centered card stack displaying album artwork, song title, artist, embedded playback controls, and like/skip affordances.
-- **Swipe Right / Tap Heart:** Likes the track, saving it to the canonical **Liked** library (`users/{uid}/likes/{songId}`). If sharing is enabled, atomically publishes an active share record (`shares/{shareId}`) for the current privacy epoch.
+- **Swipe Right / Tap Heart:** Likes the track, saving it to the canonical **Liked** library (`users/{uid}/likes/{songId}`). Like and share are one behavior: if sharing is enabled, the same transaction publishes an active share record (`shares/{shareId}`) for the current privacy epoch, and this applies to a like from any screen.
 - **Swipe Left / Tap Skip:** Neutral gesture to advance to the next candidate track. Does not permanently block or dislike the song.
-- **Idempotency:** Swiping right on a track already in Liked does not duplicate records or silently republish historical private likes.
+- **Idempotency:** Swiping right on a track already in Liked does not duplicate records or republish an earlier like.
 - **Familiar Bar Entry:** Header fire icon opens the bottom sheet selector to adjust recommendation mode.
 
 ### 4.2. Subtab: "My Friends" (Friend-Shared Discoveries)
@@ -104,7 +104,7 @@ The **Search** tab provides full-catalog exploration:
 - For the 50–100 track MVP catalog, active catalog metadata is fetched and cached locally; Global Search filters this cached catalog on-device by song title or artist name using a brief UI debounce for smooth typing, with clear loading and retry states for the initial catalog fetch.
 - Result rows display album art, title, artist, and actionable controls:
   - Tap row to immediately stream the song (spawns the mini player).
-  - Heart action to save to Liked (private save; does not auto-publish to friends' feeds).
+  - Heart action to like the song: same as any like, it saves to Liked and, if sharing is enabled, also shows it to friends.
   - Overflow menu / "Add to playlist" sheet to append to custom personal playlists.
 - Distinct placeholder (*"Search songs or artists"*) to avoid confusion with playlist-local search (*"Search this playlist"*).
 
@@ -131,10 +131,10 @@ The **Account** tab oversees user identity, privacy settings, and session state:
 - **Profile Overview:** Displays avatar, display name, immutable username, and email.
 - **Edit Profile:** Update display name and select/upload a new avatar image from the device.
 - **Privacy Controls — "Share discoveries with friends":**
-  - Main switch governing whether right swipes on Explore are visible to friends.
+  - Main switch governing whether your likes, from any screen, are visible to friends.
   - **Epoch-Based Privacy (`shareEpoch`):**
     - Defaults to OFF upon account creation.
-    - **When Enabled:** New right-swiped tracks in My Explore create active shares tagged with the current epoch.
+    - **When Enabled:** New liked tracks, from any screen, create active shares tagged with the current epoch.
     - **When Disabled:** Atomically increments `shareEpoch`, immediately hiding all past shares from friends' feeds. Liked tracks in the user's private library remain untouched.
     - **When Re-enabled:** Only newly liked tracks in the new epoch become visible to friends; historical shares from previous epochs remain permanently hidden.
 - **Activity Feed:** Lists incoming heart reactions received from friends on shared music (with fallback display such as "Shared song is no longer available" if the share was revoked or unfriended).

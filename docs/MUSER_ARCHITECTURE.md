@@ -275,8 +275,8 @@ Controllers and repositories are concrete classes/adapters where useful; not eve
 
 - Liked is users/{uid}/likes; custom playlists hold independent memberships.
 - Adding a liked song to another playlist leaves it in Liked. Unlike does not delete custom memberships.
-- My Explore right swipe creates Liked membership; only an eligible new swipe while sharing is enabled creates a share.
-- Search or My Friends saves do not automatically re-share.
+- Like and share are one behavior. A new like from any screen creates Liked membership and, in the same transaction, a share while sharing is enabled.
+- A like made while sharing is off creates no share, and a later switch-on does not publish it.
 - A heart targets one person's share, never the global song; it does not save music.
 - Only heart is supported. User cannot unsend/update/delete it. One successful event means one Activity row, not a grouped row.
 - Baseline is one heart per sender per share, matching the earlier Sent state. Repeated intentional hearts remain a separate product decision; network retries must never create additional events in either design.
@@ -342,7 +342,7 @@ Use cursor pagination with deterministic tie-breakers and maximum page sizes. An
 
 ### Right swipe
 
-App animates card -> save use case -> API transaction reads current user/like -> validates source and song -> creates unique like -> optionally creates share and links it -> commits -> returns saved/shared flags. UI reflects server-confirmed outcome and reconciles failed optimistic saves. Already-liked saves return existing state without new shares.
+App animates card -> save use case -> API transaction reads current user/like -> validates source and song -> creates unique like -> creates the share and links it when sharing is enabled -> commits -> returns saved/shared flags. UI reflects server-confirmed outcome and reconciles failed optimistic saves. Already-liked saves return existing state without new shares.
 
 ### Send heart
 
@@ -352,7 +352,7 @@ The transaction reads the documents whose concurrent changes revoke authorizatio
 
 ### Privacy off
 
-API transaction sets sharingEnabled=false and increments epoch -> future feed/heart requests fail visibility checks -> app clears related cached feed cards on refresh/privacy invalidation. Already downloaded bytes cannot be remotely erased. Enabling later leaves the epoch unchanged; only new eligible shares become visible.
+API transaction sets sharingEnabled=false and increments epoch -> future feed/heart requests fail visibility checks -> app clears related cached feed cards on refresh/privacy invalidation. Already downloaded bytes cannot be remotely erased. Enabling later leaves the epoch unchanged; only new likes, which create new shares, become visible.
 
 ### Playback
 
