@@ -4,6 +4,8 @@ export interface Me {
   email: string | null;
   hasProfile: boolean;
   onboardingCompleted: boolean;
+  /** Present once the S05 profile exists. */
+  profile?: { username: string; displayName: string; avatarPath: string | null } | null;
 }
 
 export interface MeRepository {

@@ -1,7 +1,7 @@
 import Svg, { Path } from "react-native-svg";
 
 import { colors, sizes, type ColorToken } from "@/shared/theme";
-import { icons, type IconName } from "./icons";
+import { icons, type IconDefinition, type IconName } from "./icons";
 
 export interface IconProps {
   name: IconName;
@@ -11,7 +11,8 @@ export interface IconProps {
 
 /** Decorative by default: put the accessible name on the pressable that wraps the icon. */
 export function Icon({ name, size = sizes.iconDefault, color = "textSecondary" }: IconProps) {
-  const { viewBox, strokeWidth, paths } = icons[name];
+  const definition: IconDefinition = icons[name];
+  const { viewBox, strokeWidth, paths, filled = false } = definition;
   return (
     <Svg
       width={size}
@@ -25,6 +26,7 @@ export function Icon({ name, size = sizes.iconDefault, color = "textSecondary" }
         <Path
           key={d}
           d={d}
+          fill={filled ? colors[color] : "none"}
           stroke={colors[color]}
           strokeWidth={strokeWidth}
           strokeLinecap="round"

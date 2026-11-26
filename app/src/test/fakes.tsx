@@ -4,10 +4,14 @@ import { render } from "@testing-library/react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ServicesProvider, type Services } from "@/application/services";
+import { makePlaylist } from "./fixtures";
 import type { AuthRepository } from "@/domain/auth";
 import type { CatalogRepository } from "@/domain/catalog";
+import type { DiscoveryRepository } from "@/domain/discovery";
+import type { LibraryRepository } from "@/domain/library";
 import type { MeRepository } from "@/domain/me";
 import type { OnboardingRepository } from "@/domain/onboarding";
+import type { SocialRepository } from "@/domain/social";
 
 export function createFakeServices(
   overrides: {
@@ -15,6 +19,9 @@ export function createFakeServices(
     me?: Partial<MeRepository>;
     catalog?: Partial<CatalogRepository>;
     onboarding?: Partial<OnboardingRepository>;
+    library?: Partial<LibraryRepository>;
+    social?: Partial<SocialRepository>;
+    discovery?: Partial<DiscoveryRepository>;
   } = {},
 ): Services {
   const auth: AuthRepository = {
@@ -48,7 +55,38 @@ export function createFakeServices(
     complete: jest.fn(async () => {}),
     ...overrides.onboarding,
   };
-  return { auth, me, catalog, onboarding };
+  const library: LibraryRepository = {
+    listLikes: jest.fn(async () => []),
+    like: jest.fn(async () => {}),
+    unlike: jest.fn(async () => {}),
+    listPlaylists: jest.fn(async () => []),
+    createPlaylist: jest.fn(async (name: string) => makePlaylist("p1", name)),
+    renamePlaylist: jest.fn(async () => {}),
+    deletePlaylist: jest.fn(async () => {}),
+    listPlaylistSongs: jest.fn(async () => []),
+    addToPlaylist: jest.fn(async () => {}),
+    removeFromPlaylist: jest.fn(async () => {}),
+    ...overrides.library,
+  };
+  const social: SocialRepository = {
+    findUser: jest.fn(async () => null),
+    listFriends: jest.fn(async () => []),
+    listRequests: jest.fn(async () => ({ incoming: [], outgoing: [] })),
+    sendRequest: jest.fn(async () => {}),
+    respond: jest.fn(async () => {}),
+    removeFriend: jest.fn(async () => {}),
+    getSharing: jest.fn(async () => false),
+    setSharing: jest.fn(async () => {}),
+    listDiscoveries: jest.fn(async () => []),
+    sendHeart: jest.fn(async () => {}),
+    listActivity: jest.fn(async () => []),
+    ...overrides.social,
+  };
+  const discovery: DiscoveryRepository = {
+    recommend: jest.fn(async () => ({ level: "explore" as const, songs: [] })),
+    ...overrides.discovery,
+  };
+  return { auth, me, catalog, onboarding, library, social, discovery };
 }
 
 const safeAreaMetrics = {

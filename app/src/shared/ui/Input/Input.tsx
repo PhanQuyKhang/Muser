@@ -17,6 +17,7 @@ export interface InputProps extends Pick<
   | "returnKeyType"
   | "onSubmitEditing"
   | "maxLength"
+  | "autoFocus"
   | "editable"
 > {
   /** Persistent label above the field. Placeholders are examples, never the only label. */

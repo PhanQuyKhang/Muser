@@ -6,6 +6,7 @@ interface MeResponseDto {
   email: string | null;
   hasProfile: boolean;
   onboardingCompleted: boolean;
+  profile: Me["profile"];
 }
 
 export class ApiMeRepository implements MeRepository {
@@ -18,6 +19,7 @@ export class ApiMeRepository implements MeRepository {
       email: dto.email,
       hasProfile: dto.hasProfile,
       onboardingCompleted: dto.onboardingCompleted,
+      profile: dto.profile,
     };
   }
 }

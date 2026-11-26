@@ -1,4 +1,5 @@
 import type { Artist, Song, Tag } from "@/domain/catalog";
+import type { LibraryEntry, Playlist } from "@/domain/library";
 
 export const makeTag = (id: string, label: string, category: Tag["category"]): Tag => ({
   id,
@@ -33,3 +34,17 @@ export const makeArtist = (id: string, name: string): Artist => ({
 });
 
 export const testUser = { uid: "u1", email: "a@b.co" };
+
+export const makePlaylist = (id: string, name: string): Playlist => ({
+  id,
+  name,
+  coverPath: null,
+  createdAt: "2026-11-01T00:00:00.000Z",
+  updatedAt: "2026-11-01T00:00:00.000Z",
+});
+
+export const makeEntry = (song: Song, addedAt = "2026-11-01T00:00:00.000Z"): LibraryEntry => ({
+  songId: song.id,
+  addedAt,
+  song,
+});
