@@ -11,16 +11,23 @@ import type { CatalogService } from "../modules/catalog/application/catalog.serv
 import { catalogRouter } from "../modules/catalog/transport/catalog.controller";
 import type { LibraryService } from "../modules/library/application/library.service";
 import { libraryRouter } from "../modules/library/transport/library.controller";
+import type { SocialService } from "../modules/social/application/social.service";
+import { socialRouter } from "../modules/social/transport/social.controller";
+import type { RecommendationService } from "../modules/recommendation/application/recommendation.service";
+import { recommendationRouter } from "../modules/recommendation/transport/recommendation.controller";
 
 export interface AppDependencies {
   verifier: TokenVerifier;
   identity: IdentityServices;
   catalog: CatalogService;
   library: LibraryService;
+  social: SocialService;
+  recommendations: RecommendationService;
 }
 
 // Composition root: build the HTTP app from injected dependencies.
-export function createApp({ verifier, identity, catalog, library }: AppDependencies) {
+export function createApp(deps: AppDependencies) {
+  const { verifier, identity, catalog, library, social, recommendations } = deps;
   const app = express();
   app.disable("x-powered-by");
   app.use(requestContext);
@@ -39,6 +46,8 @@ export function createApp({ verifier, identity, catalog, library }: AppDependenc
     onboardingRouter(identity.completeOnboarding),
     catalogRouter(catalog),
     libraryRouter(library),
+    socialRouter(social),
+    recommendationRouter(recommendations),
   );
 
   app.use(notFoundHandler);

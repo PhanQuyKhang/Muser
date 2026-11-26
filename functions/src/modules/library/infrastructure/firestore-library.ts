@@ -11,6 +11,7 @@ import type {
   LibraryQueries,
   LibraryRepositories,
   LikeRepository,
+  LikeSharingRepository,
   ListQuery,
   Page,
   PlaylistCleanup,
@@ -119,12 +120,48 @@ class TxItems implements PlaylistItemRepository {
   }
 }
 
+class TxSharing implements LikeSharingRepository {
+  constructor(private db: Firestore, private tx: Transaction) {}
+
+  async getSettings(uid: string) {
+    const d = await this.tx.get(this.db.doc(`users/${uid}`));
+    return {
+      sharingEnabled: d.get("sharingEnabled") === true,
+      shareEpoch: (d.get("shareEpoch") as number | undefined) ?? 0,
+    };
+  }
+  async create(share: { id: string; ownerId: string; songId: string; sharedAt: Date; epoch: number }) {
+    this.tx.create(this.db.doc(`shares/${share.id}`), {
+      ownerId: share.ownerId,
+      songId: share.songId,
+      sharedAt: Timestamp.fromDate(share.sharedAt),
+      epoch: share.epoch,
+      active: true,
+      deactivatedAt: null,
+      deactivationReason: null,
+    });
+  }
+  async deactivate(shareId: string, at: Date) {
+    // merge: a share removed by account cleanup must not make the unlike fail.
+    this.tx.set(
+      this.db.doc(`shares/${shareId}`),
+      { active: false, deactivatedAt: Timestamp.fromDate(at), deactivationReason: "unliked" },
+      { merge: true },
+    );
+  }
+}
+
 export class FirestoreLibraryUnitOfWork implements UnitOfWork<LibraryRepositories> {
   constructor(private readonly db: Firestore) {}
 
   run<T>(work: (repos: LibraryRepositories) => Promise<T>): Promise<T> {
     return this.db.runTransaction((tx) =>
-      work({ likes: new TxLikes(this.db, tx), playlists: new TxPlaylists(this.db, tx), items: new TxItems(this.db, tx) }),
+      work({
+        likes: new TxLikes(this.db, tx),
+        sharing: new TxSharing(this.db, tx),
+        playlists: new TxPlaylists(this.db, tx),
+        items: new TxItems(this.db, tx),
+      }),
     );
   }
 }

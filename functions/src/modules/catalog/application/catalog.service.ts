@@ -135,6 +135,11 @@ export class CatalogService {
     return { songs: matchedSongs, artists: matchedArtists };
   }
 
+  /** The active catalog (briefly cached), for ranking in the Recommendation module. */
+  listActive(): Promise<{ songs: Song[]; artists: Artist[] }> {
+    return this.activeCatalog();
+  }
+
   private async activeCatalog() {
     const now = this.clock.now().getTime();
     if (!this.searchCache || now - this.searchCache.at > SEARCH_CACHE_TTL_MS) {

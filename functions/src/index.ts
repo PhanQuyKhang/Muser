@@ -17,6 +17,10 @@ import {
   FirestoreLibraryUnitOfWork,
   FirestorePlaylistCleanup,
 } from "./modules/library/infrastructure/firestore-library";
+import { SocialService } from "./modules/social/application/social.service";
+import { FirestoreSocialQueries, FirestoreSocialUnitOfWork } from "./modules/social/infrastructure/firestore-social";
+import { RecommendationService } from "./modules/recommendation/application/recommendation.service";
+import { FirestoreTasteRepository } from "./modules/recommendation/infrastructure/firestore-taste";
 import {
   FirestoreIdentityQueries,
   FirestoreIdentityUnitOfWork,
@@ -49,6 +53,27 @@ const library = new LibraryService({
   newId: () => randomUUID(),
 });
 
+const social = new SocialService({
+  uow: new FirestoreSocialUnitOfWork(db),
+  queries: new FirestoreSocialQueries(db),
+  songs: { getSongsByIds: (ids) => catalog.getSongsByIds(ids) },
+  clock: systemClock,
+});
+
+const recommendations = new RecommendationService({
+  tastes: new FirestoreTasteRepository(db),
+  catalog: { listActive: () => catalog.listActive() },
+});
+
 // NOTE: before the first deploy, set the function region to match the Firestore region
 // (see docs/MUSER_DEPLOYMENT.md). It is intentionally not defaulted here.
-export const api = onRequest(createApp({ verifier: new FirebaseTokenVerifier(), identity, catalog, library }));
+export const api = onRequest(
+  createApp({
+    verifier: new FirebaseTokenVerifier(),
+    identity,
+    catalog,
+    library,
+    social,
+    recommendations,
+  }),
+);

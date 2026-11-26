@@ -27,6 +27,8 @@ describe.skipIf(!host)("profile + onboarding against the Firestore emulator", ()
     const uow = new FirestoreIdentityUnitOfWork(db);
     const queries = new FirestoreIdentityQueries(db);
     app = createApp({
+      social: {} as never,
+      recommendations: {} as never,
       library: {} as LibraryService, // not used by identity routes
       // Test tokens look like "t-<uid>"; the real verifier is covered by the auth tests.
       verifier: { verify: async (t) => (t.startsWith("t-") ? { uid: t.slice(2) } : Promise.reject(new Error("bad"))) },

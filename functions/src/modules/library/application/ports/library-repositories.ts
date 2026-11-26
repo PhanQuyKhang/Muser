@@ -40,7 +40,15 @@ export interface PlaylistItemRepository {
   remove(playlistId: string, songId: string): Promise<void>;
 }
 
+/** The share half of a like (MUSER_DATABASE.md §7): same transaction as the like itself. */
+export interface LikeSharingRepository {
+  getSettings(uid: string): Promise<{ sharingEnabled: boolean; shareEpoch: number }>;
+  create(share: { id: string; ownerId: string; songId: string; sharedAt: Date; epoch: number }): Promise<void>;
+  deactivate(shareId: string, at: Date): Promise<void>;
+}
+
 export interface LibraryRepositories {
+  sharing: LikeSharingRepository;
   likes: LikeRepository;
   playlists: PlaylistRepository;
   items: PlaylistItemRepository;

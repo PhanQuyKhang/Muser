@@ -62,7 +62,10 @@ export class LibraryService {
 
   // ---------------------------------------------------------------- Liked
 
-  /** Idempotent save. Saving an already-liked song changes nothing (no new likedAt). */
+  /**
+   * Idempotent save. A NEW like also shares the song when sharing is on, in the same
+   * transaction. Saving an already-liked song changes nothing (no new likedAt or share).
+   */
   async likeSong(
     uid: string,
     songId: string,
@@ -70,9 +73,11 @@ export class LibraryService {
   ): Promise<{ created: boolean; like: Like }> {
     await this.d.songs.getSong(songId); // NOT_FOUND unless the song exists and is active
     const now = this.d.clock.now(); // fixed outside the transaction so a retry reuses it
+    const shareId = this.d.newId();
 
-    return this.d.uow.run(async ({ likes }) => {
-      const existing = await likes.get(uid, songId);
+    return this.d.uow.run(async ({ likes, sharing }) => {
+      // All reads first (Firestore transactions require reads before writes).
+      const [existing, settings] = await Promise.all([likes.get(uid, songId), sharing.getSettings(uid)]);
       if (existing) return { created: false, like: existing };
 
       const like: Like = {
@@ -80,19 +85,23 @@ export class LibraryService {
         likedAt: now,
         source: input.source,
         sourceShareId: input.source === "friends" ? input.sourceShareId : null,
-        activeShareId: null, // the Sharing module creates the share in this same transaction later
+        activeShareId: settings.sharingEnabled ? shareId : null,
       };
       await likes.create(uid, like);
+      if (settings.sharingEnabled) {
+        await sharing.create({ id: shareId, ownerId: uid, songId, sharedAt: now, epoch: settings.shareEpoch });
+      }
       return { created: true, like };
     });
   }
 
-  /** Idempotent. Never touches playlist memberships or past reactions. */
+  /** Idempotent. Removes the like and its share; never playlist memberships or past reactions. */
   async unlikeSong(uid: string, songId: string): Promise<void> {
-    await this.d.uow.run(async ({ likes }) => {
+    const now = this.d.clock.now();
+    await this.d.uow.run(async ({ likes, sharing }) => {
       const existing = await likes.get(uid, songId);
       if (!existing) return;
-      // Sharing will deactivate existing.activeShareId in this same transaction.
+      if (existing.activeShareId) await sharing.deactivate(existing.activeShareId, now);
       await likes.delete(uid, songId);
     });
   }

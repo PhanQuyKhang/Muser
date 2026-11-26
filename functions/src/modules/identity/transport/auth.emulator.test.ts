@@ -31,7 +31,7 @@ describe.skipIf(!host)("authentication against the Auth emulator", () => {
       getMe: { execute: async () => ({ profile: null, onboardingCompleted: false }) },
       completeOnboarding: {},
     } as unknown as IdentityServices;
-    app = createApp({ verifier: new FirebaseTokenVerifier(), identity, catalog: {} as CatalogService, library: {} as LibraryService });
+    app = createApp({ verifier: new FirebaseTokenVerifier(), identity, catalog: {} as CatalogService, library: {} as LibraryService, social: {} as never, recommendations: {} as never });
   });
 
   it("accepts a real ID token and returns the token's uid", async () => {
