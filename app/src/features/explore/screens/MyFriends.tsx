@@ -55,7 +55,8 @@ export function MyFriends() {
       cards={discoveries.data.map(({ song, sharers }) => ({
         song,
         ...(sharers[0] ? { shareId: sharers[0].shareId } : {}),
-        extra: <Attribution key={song.id} sharers={sharers} />,
+        // Differs from the card's key (the two are siblings) and resets the heart per song.
+        extra: <Attribution key={`sharers-${song.id}`} sharers={sharers} />,
       }))}
       source="friends"
       onRestart={() => void discoveries.refetch()}

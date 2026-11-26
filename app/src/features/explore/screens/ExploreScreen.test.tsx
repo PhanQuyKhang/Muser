@@ -39,6 +39,7 @@ describe("ExploreScreen (S10, S11)", () => {
   });
 
   it("sends a heart on a friend's song without liking it", async () => {
+    const consoleError = jest.spyOn(console, "error");
     const services = createFakeServices({
       social: {
         listFriends: jest.fn(async () => [{ pairId: "p", profile }]),
@@ -59,5 +60,8 @@ describe("ExploreScreen (S10, S11)", () => {
     );
     expect(await screen.findByRole("button", { name: "Heart sent" })).toBeTruthy();
     expect(services.library.like).not.toHaveBeenCalled();
+    // The card and the sharer line are siblings, so React reports it if their keys collide.
+    expect(consoleError.mock.calls.flat().join(" ")).not.toContain("same key");
+    consoleError.mockRestore();
   });
 });
