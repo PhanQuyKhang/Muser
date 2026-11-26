@@ -1,0 +1,14 @@
+/* hook slide */
+.hk{position:absolute;left:140px;right:140px;top:300px}
+.wave{position:relative;height:300px;display:flex;align-items:center;gap:6px}
+.wave s{flex:1;background:#4b4960;border-radius:6px;text-decoration:none;transition:background .5s,box-shadow .5s}
+.slide.s2 .wave s.hot{background:var(--mint);box-shadow:0 0 18px rgba(121,223,195,.7)}
+.wave .zone{position:absolute;left:calc(55 / 90 * 100%);width:calc(23 / 90 * 100%);top:-14px;bottom:-14px;border:3px solid var(--mint);border-radius:22px;opacity:0;transition:opacity .5s}
+.slide.s2 .wave .zone{opacity:1}
+.ph{position:absolute;left:0;top:-30px;bottom:-30px;width:6px;border-radius:3px;background:var(--lav);box-shadow:0 0 22px var(--lav);transition:left .9s cubic-bezier(.7,0,.2,1)}
+.slide.s2 .ph{left:calc(55 / 90 * 100%);background:var(--mint);box-shadow:0 0 26px var(--mint)}
+.hl{display:flex;justify-content:space-between;margin-top:40px;font-size:30px;color:var(--muted)}
+.hl .hm{position:absolute;left:calc(55 / 90 * 100%);color:var(--mint);font-weight:700}
+.hl{position:relative}
+.hnote{font-size:38px;color:var(--muted);text-align:center;margin-top:70px}
+.hnote.big{font-size:56px;font-weight:700;margin-top:30px}

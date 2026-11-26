@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Muser — Assignment 1</title>
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck2.css">
+<link rel="stylesheet" href="deck3.css">
+<link rel="stylesheet" href="deck4.css">
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div id="vignette"></div>
+<div id="progress"><i></i></div>
+
+<div id="stage">
+
+<!-- 01 TITLE -->
+<section class="slide" data-pose="hero" data-t="20">
+  <div class="center">
+    <div class="eyebrow rv" style="--i:0">Assignment 1 · Nov 2026</div>
+    <h1 class="logo rv" style="--i:1">Muser</h1>
+    <p class="sub rv" style="--i:3">Find your next song.</p>
+    <div class="hint rv" style="--i:5">press → to start · N notes · M music</div>
+  </div>
+  <aside class="notes">Hi everyone. We're presenting Muser, a mobile app for finding new songs quickly, with your friends, on your own terms. About twelve minutes: the problem, the idea, how it works, and how it's built.</aside>
+</section>
+
+<!-- 02 TOO MANY SONGS -->
+<section class="slide" data-pose="wall" data-t="30">
+  <div class="center">
+    <h2 class="rv" style="--i:0">Millions of songs.</h2>
+    <h2 class="rv grad" style="--i:2">Same three playlists.</h2>
+    <div class="tiles rv" style="--i:4">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      <i></i><i class="glow"></i><i></i><i></i><i class="glow g2"></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i class="glow g3"></i><i></i><i></i><i></i><i></i>
+    </div>
+  </div>
+  <aside class="notes">Streaming apps hold millions of tracks, yet we fall back to the same few playlists. There's no simple way to say how adventurous the next song should be. That's choice overload.</aside>
+</section>
+
+<!-- 03 SLOW TO FIND -->
+<section class="slide" data-pose="dim" data-scrim="1" data-t="30">
+  <div class="center wide">
+    <h2 class="rv" style="--i:0">Judging a song is slow.</h2>
+    <div class="compare">
+      <div class="row rv" style="--i:2">
+        <span class="lab">Today</span>
+        <span class="node">Search</span><b>→</b><span class="node">Open</span><b>→</b><span class="node">Listen</span><b>→</b><span class="node">Decide</span>
+      </div>
+      <div class="row rv" style="--i:4">
+        <span class="lab mint">Muser</span>
+        <span class="node big mint">Swipe</span>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Today, judging a song means searching, opening, listening, then deciding. Muser collapses it into one gesture: swipe.</aside>
+</section>
+
+<!-- 04 FRIENDS HIDDEN -->
+<section class="slide" data-pose="dim" data-scrim="1" data-t="30">
+  <div class="split">
+    <div class="col">
+      <h2 class="rv" style="--i:0">Friends' taste is hidden.</h2>
+      <p class="sub rv" style="--i:2">Sharing a song means leaving the app, and the link gets buried.</p>
+    </div>
+    <div class="col">
+      <div class="chat rv" style="--i:2">
+        <div class="msg m1">lol see you at 8</div>
+        <div class="msg m2 song">♫ song-link.com/x7Q</div>
+        <div class="msg m3">where are you??</div>
+        <div class="msg m4">omg did you see that</div>
+        <div class="msg m5">📷 photo</div>
+        <div class="msg m6">brb</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Music sharing lives in chat apps, as links outside the player. A song sent today is buried by tonight, and there's no lightweight reaction. Privacy is also all or nothing: users want to share some discoveries and hide them later.</aside>
+</section>
+
+<!-- 05 BORROWED -->
+<section class="slide" data-pose="ring" data-scrim="1" data-steps="4" data-t="45">
+  <div class="top">
+    <h2 class="rv" style="--i:0">We borrowed what already works.</h2>
+  </div>
+  <div class="scenes">
+    <div class="scene sA st" data-s="1">
+      <div class="art swipe-art">
+        <div class="mc"><span class="stamp like">♥</span><span class="stamp skip">✕</span></div>
+      </div>
+      <div class="cap"><b>Swipe</b><span>like Tinder · fast and effective</span></div>
+      <img class="badge" src="img/apps/tinder.png" alt="" onerror="this.remove()">
+    </div>
+    <div class="scene sB st" data-s="2">
+      <div class="art loc-art">
+        <div class="bubble"><i class="av"></i><b class="hb">♥</b></div>
+        <div class="bubble b2"><i class="av a2"></i></div>
+      </div>
+      <div class="cap"><b>Share fast</b><span>like Locket · close friends, no chat</span></div>
+      <img class="badge" src="img/apps/locket.png" alt="" onerror="this.remove()">
+    </div>
+    <div class="scene sC st" data-s="3">
+      <div class="art mini-art">
+        <div class="mp"><i class="cv"></i><div class="mt"><b></b><s></s></div><em>❚❚</em></div>
+        <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="cap"><b>Stream</b><span>a place to actually play the music</span></div>
+    </div>
+    <div class="merge st" data-s="4"><span class="logo sm">Muser</span><p>Discovery, friends and listening in one app.</p></div>
+  </div>
+  <aside class="notes">We adapted three ideas that already work. Swiping, like Tinder, because it's the fastest way to decide. Sharing fast with close friends, like Locket, with no chat. And we also give the user a place to stream the music, so everything stays in one app. Tinder and Locket aren't music apps, so this is design inspiration, not proof.</aside>
+</section>
+
+<!-- 06 PERSONAS -->
+<section class="slide" data-pose="cloud" data-scrim="1" data-t="30">
+  <div class="top"><h2 class="rv" style="--i:0">Three listeners.</h2></div>
+  <div class="cards3">
+    <div class="persona rv" style="--i:1"><i class="pav" style="--c:#B9A3FF">L</i><h3>Linh, 20</h3><p>Student. Wants two or three new songs a day, without effort.</p><span class="tag">Swipe deck · Familiar Bar</span></div>
+    <div class="persona rv" style="--i:2"><i class="pav" style="--c:#79DFC3">M</i><h3>Minh, 22</h3><p>Sharer. Wants friends to see what he likes, and react.</p><span class="tag">Friends deck · hearts</span></div>
+    <div class="persona rv" style="--i:3"><i class="pav" style="--c:#F2A7D5">A</i><h3>An, 21</h3><p>Private listener. Shares only in chosen periods.</p><span class="tag">Privacy switch</span></div>
+  </div>
+  <aside class="notes">Three personas guide the requirements. Linh wants effortless discovery. Minh wants to share and see reactions. An wants friends' picks but wants control over what's public. They are illustrative, not measured data.</aside>
+</section>
+
+<!-- 07 REQUIREMENTS -->
+<section class="slide" data-pose="dim" data-scrim="1" data-t="30">
+  <div class="top"><h2 class="rv" style="--i:0">Requirements and targets.</h2></div>
+  <div class="stats small">
+    <div class="stat rv" style="--i:1"><b>39</b><p>functional requirements<br><strong>29 Must &middot; 8 Should &middot; 2 Could</strong></p></div>
+    <div class="stat rv" style="--i:2"><b>&le; 800<em>ms</em></b><p>API reads, p95</p></div>
+    <div class="stat rv" style="--i:3"><b>&ge; 50<em>fps</em></b><p>swipe card on mid-range Android</p></div>
+    <div class="stat rv" style="--i:4"><b>&le; 3<em>s</em></b><p>first audio after play</p></div>
+  </div>
+  <div class="src rv" style="--i:5">Sharing is off by default. Every requirement has a test we can run in Assignment 2.</div>
+  <aside class="notes">Before the solution, what we committed to. Thirty-nine functional requirements, twenty-nine of them must-haves, each written as a user story with testable acceptance criteria. And measurable targets: API reads under 800 milliseconds at the 95th percentile, swipe at 50 frames per second or better, first audio within three seconds. Sharing defaults to off.</aside>
+</section>
+
+<!-- 07 RESEARCH -->
+<section class="slide" data-pose="dim" data-scrim="1" data-t="35">
+  <div class="top"><h2 class="rv" style="--i:0">What the research says.</h2></div>
+  <div class="stats">
+    <div class="stat rv" style="--i:1"><b class="count" data-to="50">0</b><em>%</em><p>of 18–24-year-olds find music through <strong>social media</strong></p></div>
+    <div class="stat rv" style="--i:2"><b class="count" data-to="35">0</b><em>%</em><p>find it through <strong>friends and family</strong></p></div>
+    <div class="stat text rv" style="--i:3"><b>Different</b><p>listeners want different amounts of <strong>unfamiliar music</strong></p></div>
+  </div>
+  <div class="src rv" style="--i:4">YouGov survey, 17 markets, Nov 2021 · Moscati et al., UMAP 2025</div>
+  <aside class="notes">Two findings shaped us. Young adults lean on social feeds and friends: in the YouGov survey, fifty percent of 18 to 24 year olds find music on social media, thirty-five percent through friends and family. And listeners differ in how much new music they want, so one fixed recommendation style can't suit everyone. Honest caveat: these studies are about discovery in general. We found no verified study on how comfortable people are sharing liked songs, so our sharing switch is a design decision.</aside>
+</section>
+
+<!-- 08 COMPETITORS -->
+<section class="slide" data-pose="dim" data-scrim="1" data-t="30">
+  <div class="top"><h2 class="rv" style="--i:0">Who else is out there?</h2></div>
+  <div class="cpanels">
+    <div class="cp rv" style="--i:1">
+      <div class="ill ill-a">
+        <div class="tg"><img src="img/covers/03.jpg" alt=""><img src="img/covers/02.jpg" alt=""><img src="img/covers/04.jpg" alt=""><img src="img/covers/10.jpg" alt=""></div>
+        <div class="np"><img src="img/covers/05.jpg" alt=""><div class="tx"><b></b><s></s></div><em>&#9654;</em></div>
+      </div>
+      <h3>Big streaming</h3>
+      <p>Great playlists. Little control over how new.</p>
+      <div class="pills"><span>Spotify</span><span>Apple Music</span><span>YouTube Music</span></div>
+    </div>
+    <div class="cp rv" style="--i:2">
+      <div class="ill ill-b">
+        <div class="back b1"></div><div class="back b2"></div>
+        <div class="front"><img src="img/covers/07.jpg" alt=""><span class="stamp like">&#9829;</span><span class="stamp skip">&#10005;</span></div>
+      </div>
+      <h3>Swipe apps</h3>
+      <p>Fast to decide. No friends, no novelty dial.</p>
+      <div class="pills"><span>TikTok</span><span>The Best Song</span><span>Choosic</span><span>Musiclips</span></div>
+    </div>
+    <div class="cp rv" style="--i:3">
+      <div class="ill ill-c">
+        <div class="fr1"><i class="av"></i><div class="bb"><img src="img/covers/09.jpg" alt=""><span>Weird Fishes</span></div></div>
+        <div class="fr1 r"><div class="bb"><img src="img/covers/11.jpg" alt=""><span>So What</span></div><i class="av a2"></i></div>
+        <div class="fr1"><i class="av a3"></i><div class="bb"><img src="img/covers/06.jpg" alt=""><span>Do I Wanna Know?</span></div></div>
+      </div>
+      <h3>Friend-sharing apps</h3>
+      <p>See what friends play. No swipe, no off switch.</p>
+      <div class="pills"><span>Groupie</span><span>Superfan</span></div>
+    </div>
+  </div>
+  <div class="src rv" style="--i:4">Swipe-to-discover isn't new. Illustrations are ours; apps from public pages, not checked for activity.</div>
+  <aside class="notes">The idea isn't new. Big streaming apps are strong at recommendation but give little control over how new a song is. Swipe apps have existed since around 2014, but have no friends and no novelty dial. A few apps focus on sharing between friends, without a swipe deck or a way to take shares back. We don't claim to be first.</aside>
+</section>
+
+<!-- 09 GAP GRID -->
+<section class="slide" data-pose="dim" data-scrim="1" data-steps="2" data-t="35">
+  <div class="top"><h2 class="rv" style="--i:0">The gap we fill.</h2></div>
+  <div class="grid">
+    <div class="gh"></div><div class="gh">Swipe</div><div class="gh">Novelty control</div><div class="gh">Friends inside</div><div class="gh">Revocable sharing</div>
+    <div class="gr">Big streaming</div><div class="d no">○</div><div class="d no">○</div><div class="d part">◐</div><div class="d no">○</div>
+    <div class="gr">TikTok</div><div class="d yes">●</div><div class="d no">○</div><div class="d part">◐</div><div class="d no">○</div>
+    <div class="gr">Swipe apps</div><div class="d yes">●</div><div class="d no">○</div><div class="d no">○</div><div class="d no">○</div>
+    <div class="gr">Friend-sharing apps</div><div class="d no">○</div><div class="d no">○</div><div class="d yes">●</div><div class="d no">○</div>
+    <div class="gr m st" data-s="1">Muser</div><div class="d yes m st" data-s="1">●</div><div class="d yes m st" data-s="1">●</div><div class="d yes m st" data-s="1">●</div><div class="d yes m st" data-s="1">●</div>
+  </div>
+  <div class="src rv st" data-s="2">● yes · ◐ partial · ○ no — from public feature sets, to be re-checked</div>
+  <aside class="notes">Put side by side, nobody combines all four: a swipe deck, a user-set novelty dial, friends' picks inside the app, and sharing the user can switch off. That combination is Muser's difference. The table comes from public feature descriptions and should be re-checked.</aside>
+</section>
+
+<!-- 10 SWIPE DEMO -->
+<section class="slide" data-pose="stack" data-scrim="1" data-t="45">
+  <div class="split demo">
+    <div class="col left">
+      <h2 class="rv" style="--i:0">Swipe.</h2>
+      <p class="sub rv" style="--i:1">One gesture: keep or skip.<br>A like is also a share.</p>
+      <div class="liked rv" style="--i:2"><h4>Liked <span id="likeCount">0</span></h4><ul id="likedList"></ul></div>
+    </div>
+    <div class="col">
+      <div id="deck" class="deck"></div>
+      <div class="btns"><button id="bSkip" class="btn ghost">✕ Skip</button><button id="bLike" class="btn mint">♥ Like</button></div>
+      <p class="tryit">drag the card</p>
+      <div class="credit">Cover art via Deezer &middot; &copy; respective owners</div>
+    </div>
+  </div>
+  <aside class="notes">Try it. Swipe right keeps a song and puts it in Liked. Swipe left skips it. When sharing is on, the same like also creates a share for friends. Like and share are one action. Every swipe also has a button for accessibility.</aside>
+</section>
+
+<!-- 10b HOOK -->
+<section class="slide" data-pose="stack" data-scrim="1" data-steps="2" data-t="30" id="slHook">
+  <div class="top"><h2 class="rv" style="--i:0">Every swipe starts at the hook.</h2></div>
+  <div class="hk">
+    <div class="wave" id="wave"><i class="zone"></i><b class="ph"></b></div>
+    <div class="hl"><span>0:00 &middot; intro</span><span class="hm st" data-s="2">1:11 &middot; chorus (peakStartMs)</span></div>
+    <p class="hnote st" data-s="1">Other screens (player, library, search) start at 0:00.</p>
+    <p class="hnote big grad st" data-s="2">The swipe deck jumps straight to the chorus. No intro to wait through.</p>
+  </div>
+  <aside class="notes">One detail that makes swiping work: each song in the catalog has a curated start point, peakStartMs, the chorus. Normally a song starts at zero. In My Explore, the swipe deck seeks straight to the hook, so you judge a song by its best part, not its intro. It's only a seek position; the audio file is unchanged. Every other screen starts at zero.</aside>
+</section>
+
+<!-- 11 FAMILIAR BAR -->
+<section class="slide" data-pose="cloud" data-scrim="1" data-t="45" id="slFamiliar">
+  <div class="split demo">
+    <div class="col left">
+      <h2 class="rv" style="--i:0">Familiar Bar.</h2>
+      <p class="sub rv" style="--i:1">How far outside your usual?</p>
+      <div class="seg rv" style="--i:2" id="seg">
+        <button data-m="familiar" class="on">Familiar</button><button data-m="explore">Explore</button><button data-m="surprise">Surprise</button>
+      </div>
+      <p class="mdesc" id="mdesc">Close to your taste.</p>
+      <p class="mnote">Changing mode never pauses the music.</p>
+    </div>
+    <div class="col">
+      <div class="orbit" id="orbit">
+        <i class="o o1"></i><i class="o o2"></i><i class="o o3"></i>
+        <b class="you">you</b>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">The Familiar Bar. The user decides how adventurous the next song should be: Familiar stays close to their taste, Explore is something new but still their vibe, Surprise steps outside their usual. Instead of guessing from listening logs, we let people say what they want. Watch the background cards react too. And changing mode never stops the current track.</aside>
+</section>
+
+<!-- 12 FRIENDS -->
+<section class="slide" data-pose="ring" data-scrim="1" data-steps="3" data-t="40" id="slFriends">
+  <div class="top"><h2 class="rv" style="--i:0">A friend's pick. A heart back.</h2></div>
+  <div class="fz">
+    <div class="fp jamie st" data-s="1">
+      <div class="who"><i class="av"></i><b>Jamie</b><span>likes a song</span></div>
+      <img class="fc" src="img/covers/12.jpg" alt="">
+      <div class="ft"><b>Houdini</b><span>Dua Lipa</span></div>
+      <div class="shared">&#8599; shared with friends</div>
+    </div>
+    <svg class="beam b1 st" data-s="2" viewBox="0 0 160 40"><path d="M0 20 H150" /><polygon points="150,10 160,20 150,30"/></svg>
+    <div class="fp mine st" data-s="2">
+      <div class="who"><i class="av a2"></i><b>You</b><span>My Friends</span></div>
+      <div class="cardbig"><img src="img/covers/12.jpg" alt=""><div class="pill"><i class="av mini"></i>Loved by Jamie Lee</div></div>
+      <div class="ft c"><b>Houdini</b><span>Dua Lipa</span></div>
+      <div class="fbtns"><button class="btn ghost">&#10005; Skip</button><button class="btn mint" id="fSave">Save</button><button class="btn pinkb" id="fHeart">&#9829;</button></div>
+      <div class="sent" id="sent">Sent &#10003;</div>
+    </div>
+    <svg class="beam b2 st" data-s="3" viewBox="0 0 160 40"><path d="M0 20 H150" /><polygon points="150,10 160,20 150,30"/></svg>
+    <div class="fp act st" data-s="3">
+      <div class="who"><i class="av"></i><b>Jamie</b><span>Activity</span></div>
+      <div class="arow"><b>&#9829;</b><span>Someone sent you a heart for <em>Houdini</em></span></div>
+      <div class="arow dim"><b>&#9829;</b><span>One row per heart. Never a duplicate.</span></div>
+    </div>
+  </div>
+  <p class="tryit">tap the heart</p>
+  <div class="credit">Cover art via Deezer &middot; &copy; respective owners</div>
+  <aside class="notes">Watch a share travel. Jamie likes Houdini, and because sharing is on, that like is also a share. It shows up in your My Friends deck with Jamie's name on it. Swipe right to save it; if your sharing is on, it's shared under your name, never as a forward. Tap the heart, and Jamie gets exactly one Activity row, a retry never creates a second. Only active shares from accepted friends appear.</aside>
+</section>
+
+<!-- 13 PRIVACY SWITCH -->
+<section class="slide" data-pose="cloud" data-scrim="1" data-t="40" id="slPrivacy">
+  <div class="top"><h2 class="rv" style="--i:0">Privacy is one switch.</h2></div>
+  <canvas id="fx" width="1920" height="1080"></canvas>
+  <div class="pv rv" style="--i:1">
+    <div class="vault" id="vault">
+      <div class="vc"><img src="img/covers/03.jpg" alt=""><img src="img/covers/04.jpg" alt=""><img src="img/covers/12.jpg" alt=""></div>
+      <div class="vlabel">Your likes</div>
+    </div>
+    <div class="mid">
+      <div class="lockwrap" id="lockwrap">
+        <svg class="lock" id="lock" viewBox="0 0 120 140"><path class="shackle" d="M32 62 V42 a28 28 0 0 1 56 0 V62" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/><rect x="14" y="60" width="92" height="72" rx="18" fill="currentColor"/><circle cx="60" cy="92" r="9" fill="#101014"/><rect x="56" y="94" width="8" height="20" rx="4" fill="#101014"/></svg>
+      </div>
+      <div class="sw" id="pvSw"><span class="knob"></span></div>
+      <div class="pstate" id="pstate">Private</div>
+    </div>
+    <div class="friends" id="friends">
+      <div class="frd"><i class="av"></i><b>Jamie</b><span class="see">sees Houdini &#9829;</span></div>
+      <div class="frd"><i class="av a2"></i><b>Minh</b><span class="see">sees Levitating &#9829;</span></div>
+      <div class="frd"><i class="av a3"></i><b>An</b><span class="see">sees Blinding Lights &#9829;</span></div>
+    </div>
+  </div>
+  <p class="pcap" id="pcap">Off by default. Nobody sees your likes.</p>
+  <p class="tryit">click the switch</p>
+  <aside class="notes">Click the switch. Sharing is off by default, so your likes stay in your vault. Turn it on, and the lock breaks: from now on, a like also reaches your friends. Turn it off, and every share you made before is pulled back at once, and friends can no longer see any of them. Turning it on again only shares new likes. This is the epoch idea we show later.</aside>
+</section>
+
+<!-- 14 PLAY & ORGANISE -->
+<section class="slide" data-pose="ring" data-t="30">
+  <div class="split">
+    <div class="col left">
+      <h2 class="rv" style="--i:0">And a place to listen.</h2>
+      <div class="chips big rv" style="--i:2"><span>Mini player</span><span>Full player</span><span>Liked</span><span>Playlists</span><span>Search</span></div>
+      <p class="sub rv" style="--i:4">Audio keeps playing across tabs.</p>
+    </div>
+    <div class="col fan2">
+      <div class="phone p1"><img src="img/library-search-1.png" alt=""></div>
+      <div class="phone p2"><img src="img/library-search-2.png" alt=""></div>
+    </div>
+  </div>
+  <aside class="notes">It's also a real player: a mini player that stays across tabs, a full player, a Liked library, playlists and catalog search. Only one song plays at a time. Discovery, friends and listening in one app.</aside>
+</section>
+
+<!-- 15 ARCHITECTURE -->
+<section class="slide" data-pose="dim" data-scrim="2" data-steps="4" data-t="50">
+  <div class="top"><h2 class="rv" style="--i:0">Architecture.</h2></div>
+  <div class="arch">
+    <div class="layer a1 st" data-s="1"><b>Mobile app</b><span>Expo · React Native · TypeScript</span><div class="mini"><i>Expo Router</i><i>TanStack Query</i><i>Zustand</i><i>Reanimated</i></div></div>
+    <div class="arrow st" data-s="2"><span>HTTPS + ID token</span></div>
+    <div class="layer a2 st" data-s="2"><b>One Express API</b><span>Cloud Functions · zod · <code>/v1</code></span></div>
+    <div class="arrow st" data-s="3"><span>checked on every call</span></div>
+    <div class="layer a3 st" data-s="3"><b>Firebase</b><span>Auth · Firestore · Storage</span></div>
+    <div class="side st" data-s="4"><svg viewBox="0 0 700 90"><path d="M20 70 C 200 10, 500 10, 680 70" fill="none" stroke="#79DFC3" stroke-width="3" stroke-dasharray="8 8"/></svg><p>Only exception: the app listens directly to its <b>own Activity feed</b></p></div>
+  </div>
+  <aside class="notes">The big picture. A layered Expo React Native app talks to one modular Express API on Cloud Functions, backed by Firebase Auth, Firestore and Storage. Every business write goes through the API, which checks the login token and permissions on every request. The only direct connection is the app listening to its own Activity feed, protected by security rules.</aside>
+</section>
+
+<!-- 16 LAYERS -->
+<section class="slide" data-pose="dim" data-scrim="2" data-steps="2" data-t="40">
+  <div class="top"><h2 class="rv" style="--i:0">Clean layers, both sides.</h2></div>
+  <div class="two">
+    <div class="stack st" data-s="1"><h4>Backend modules</h4>
+      <div class="lv l1">transport<small>routes · zod · DTOs</small></div>
+      <div class="lv l2">application<small>ports</small></div>
+      <div class="lv l3">domain<small>pure rules · no Firebase · no HTTP</small></div>
+      <div class="lv l4">infrastructure<small>Firestore</small></div>
+    </div>
+    <div class="stack st" data-s="2"><h4>Mobile app</h4>
+      <div class="lv l1">View<small>screens compose UI</small></div>
+      <div class="lv l2">ViewModel<small>hooks · TanStack Query</small></div>
+      <div class="lv l3">Application + Domain<small>services · models</small></div>
+      <div class="lv l4">Data<small>API client · repositories</small></div>
+    </div>
+  </div>
+  <div class="src rv" style="--i:3">Business rules never import Firebase, so tests use fakes.</div>
+  <aside class="notes">Both sides use clean layers. In the backend, the domain layer is pure rules with no Firebase and no HTTP codes, and dependencies are injected, so tests run with fakes. In the app, screens only compose UI, hooks act as view models with TanStack Query, and a data layer talks to the API. State is split: server state in TanStack Query, session and player in Zustand.</aside>
+</section>
+
+<!-- 17 SEQUENCE -->
+<section class="slide" data-pose="dim" data-scrim="2" data-steps="5" data-t="55">
+  <div class="top"><h2 class="rv" style="--i:0">One swipe, step by step.</h2></div>
+  <div class="seq">
+    <div class="lane"><b>App</b></div><div class="lane"><b>API</b></div><div class="lane"><b>Firestore</b></div>
+    <div class="ev e1 st" data-s="1"><i>1</i>Swipe right: like shown at once <small>(optimistic)</small></div>
+    <div class="ev e2 st" data-s="2"><i>2</i><code>PUT /v1/me/likes/:songId</code> + token</div>
+    <div class="ev e3 st" data-s="3"><i>3</i>Verify token · validate input</div>
+    <div class="ev e4 st" data-s="4"><i>4</i><b>One transaction:</b> read, then write like + share</div>
+    <div class="ev e5 st" data-s="5"><i>5</i><span class="ok">201 → confirmed</span> <span class="bad">fail → undo + Retry</span></div>
+  </div>
+  <aside class="notes">What happens on a right swipe. The app shows the like immediately. It calls the API with the user's token. The API verifies the token and validates input. Then one Firestore transaction reads first, and writes the like and, if sharing is on, the share, together. If it fails, the app undoes the like and shows Retry. Liking twice creates no second like and no new share.</aside>
+</section>
+
+<!-- 18 EPOCH -->
+<section class="slide" data-pose="dim" data-scrim="2" data-t="60" id="slEpoch">
+  <div class="top"><h2 class="rv" style="--i:0">The privacy epoch.</h2></div>
+  <div class="epoch rv" style="--i:1">
+    <div class="eline">
+      <div class="etitle">Your shares <span id="epTag">epoch 1</span></div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="ectl">
+      <div class="sw on" id="epSw"><span class="knob"></span></div>
+      <span id="epLabel">Sharing ON</span>
+    </div>
+    <div class="efeed"><span>Friends can see</span><b id="epCount">6</b></div>
+  </div>
+  <div class="rule rv" style="--i:2"><code>visible = sharing on ∧ share.epoch = user.shareEpoch</code></div>
+  <p class="tryit">click the switch</p>
+  <aside class="notes">Here's the key idea. Every share is stamped with the owner's epoch. Turning sharing off just increments the epoch, so every old share stops matching and disappears from friends' feeds immediately, with no bulk updates. Turning sharing back on only makes new likes visible, in the new epoch; old shares stay hidden. Click the switch to show it.</aside>
+</section>
+
+<!-- 19 SAFE BY DESIGN -->
+<section class="slide" data-pose="dim" data-scrim="1" data-t="40">
+  <div class="top"><h2 class="rv" style="--i:0">Safe by design.</h2></div>
+  <div class="cards3 safe">
+    <div class="persona rv" style="--i:1"><i class="pav ic2" style="--c:#B9A3FF">↻</i><h3>Retries are safe</h3><p>A like or heart repeated creates no duplicate.</p></div>
+    <div class="persona rv" style="--i:2"><i class="pav ic2" style="--c:#79DFC3">404</i><h3>Private stays private</h3><p>Someone else's data returns 404, not 403, so existence isn't leaked.</p></div>
+    <div class="persona rv" style="--i:3"><i class="pav ic2" style="--c:#F2A7D5">🔑</i><h3>Token on every call</h3><p>Identity comes only from the verified token, never the request body.</p></div>
+  </div>
+  <aside class="notes">Three rules keep it safe. Retries are idempotent: the heart id is built from the share and the sender, so a retry can't duplicate. Other people's private data returns 404 rather than 403, so we don't reveal that it exists. And every route needs a verified Firebase token; the user id is read only from the token. Firestore rules also deny direct writes to backend-owned data.</aside>
+</section>
+
+<!-- 20 APP 1 -->
+<section class="slide" data-pose="cloud" data-scrim="1" data-t="30">
+  <div class="top"><h2 class="rv" style="--i:0">The app, in three screens.</h2></div>
+  <div class="row3">
+    <figure class="rv" style="--i:1"><div class="phone"><img src="img/explore-1.png" alt=""></div><figcaption><b>Swipe</b>like or skip, one gesture</figcaption></figure>
+    <figure class="rv" style="--i:2"><div class="phone"><img src="img/explore-2.png" alt=""></div><figcaption><b>Familiar Bar</b>how far from your usual</figcaption></figure>
+    <figure class="rv" style="--i:3"><div class="phone"><img src="img/explore-3.png" alt=""></div><figcaption><b>My Friends</b>see and save what they loved</figcaption></figure>
+  </div>
+  <aside class="notes">The hi-fi design in Figma: twenty-three screens and ten sheets, with a clickable prototype. Three screens carry the idea: swipe to decide, the Familiar Bar to choose how far from your usual, and My Friends to see what friends loved.</aside>
+</section>
+
+<!-- 21 APP 2 -->
+<section class="slide" data-pose="cloud" data-scrim="1" data-t="25">
+  <div class="top"><h2 class="rv" style="--i:0">Friends and privacy.</h2></div>
+  <div class="row3">
+    <figure class="rv" style="--i:1"><div class="phone"><img src="img/friends-account-1.png" alt=""></div><figcaption><b>Friends list</b>who you share with</figcaption></figure>
+    <figure class="rv" style="--i:2"><div class="phone"><img src="img/friends-account-2.png" alt=""></div><figcaption><b>Find friends</b>by exact username</figcaption></figure>
+    <figure class="rv" style="--i:3"><div class="phone"><img src="img/friends-account-3.png" alt=""></div><figcaption><b>Privacy</b>the sharing switch</figcaption></figure>
+  </div>
+  <aside class="notes">The social side: the friends list, finding friends by exact username, and the privacy screen with the sharing switch.</aside>
+</section>
+
+<!-- 22 STATES -->
+<section class="slide" data-pose="dim" data-scrim="1" data-t="25">
+  <div class="top"><h2 class="rv" style="--i:0">Never a blank screen.</h2></div>
+  <div class="row3">
+    <figure class="rv" style="--i:1"><div class="phone"><img src="img/states-1.png" alt=""></div><figcaption><b>Loading</b>a skeleton, not a spinner</figcaption></figure>
+    <figure class="rv" style="--i:2"><div class="phone"><img src="img/states-2.png" alt=""></div><figcaption><b>Empty</b>one clear message</figcaption></figure>
+    <figure class="rv" style="--i:3"><div class="phone"><img src="img/states-3.png" alt=""></div><figcaption><b>Error</b>always with Retry</figcaption></figure>
+  </div>
+  <aside class="notes">Every remote view has loading, empty and error states, and an error is never shown as success. Accessibility: every swipe has a button alternative, touch targets are at least 48 pixels, and contrast targets WCAG AA.</aside>
+</section>
+
+<!-- 23 STATUS -->
+<section class="slide" data-pose="cloud" data-scrim="1" data-steps="2" data-t="40">
+  <div class="top"><h2 class="rv" style="--i:0">Where we are: built.</h2></div>
+  <div class="status">
+    <div class="chips done rv" style="--i:1"><span>&#10003; identity</span><span>&#10003; catalog</span><span>&#10003; library</span><span>&#10003; social</span><span>&#10003; sharing</span><span>&#10003; reactions</span><span>&#10003; recommendation</span><span>&#10003; media</span></div>
+    <div class="twoc">
+      <div class="info st" data-s="1"><i class="pav ic2" style="--c:#79DFC3">&#9834;</i><h3>Music</h3><p>Full songs, played to the end, streamed from our own storage. Never downloadable.</p></div>
+      <div class="info st" data-s="2"><i class="pav ic2" style="--c:#B9A3FF">&copy;</i><h3>Copyright</h3><p>Only cleared, licensed tracks enter the catalog. The app never sees rights data or file paths.</p></div>
+    </div>
+  </div>
+  <div class="src rv" style="--i:3">39 requirements traced to screens, API routes and modules.</div>
+  <aside class="notes">Status: everything is built. Identity, catalog, library, social, sharing, reactions, recommendation and media are all done. On music: songs play to the end, streamed from our own storage, and the app can't download them. On copyright: only cleared, licensed tracks go into the catalog, added by an admin import, and the app never receives rights data or storage paths. Every one of the 39 requirements is traced from use case to screen, feature, API route and module, so Assignment 2 acceptance tests can reuse the same IDs.</aside>
+</section>
+
+<!-- 24 CLOSE -->
+<section class="slide" data-pose="hero" data-t="25">
+  <div class="center">
+    <h2 class="rv" style="--i:0">Find music fast.</h2>
+    <h2 class="rv grad" style="--i:1">With friends.</h2>
+    <h2 class="rv" style="--i:2">On your own terms.</h2>
+    <div class="logo sm rv" style="--i:4">Muser</div>
+  </div>
+  <aside class="notes">To close: Muser lets you find music fast, with friends, on your own terms. Thank you. Happy to take questions; backup slides follow.</aside>
+</section>
+
+<!-- 25 BACKUP DATA -->
+<section class="slide backup" data-pose="dim" data-scrim="2" data-t="0">
+  <div class="top"><div class="eyebrow">Backup</div><h2>Data model.</h2></div>
+  <div class="data">
+    <div class="dc"><b>users/{uid}</b><span>sharingEnabled (default false) · shareEpoch · seeds</span></div>
+    <div class="dc"><b>users/{uid}/likes/{songId}</b><span>doc id = songId → no duplicates</span></div>
+    <div class="dc"><b>shares/{shareId}</b><span>ownerId · songId · epoch · active</span></div>
+    <div class="dc"><b>reactions/{shareId+senderId}</b><span>one heart per sender per share</span></div>
+    <div class="dc"><b>friendships/{pairId}</b><span>one document per unordered pair</span></div>
+    <div class="dc"><b>users/{uid}/activity</b><span>one row per heart · owner can read</span></div>
+    <div class="dc"><b>songs · artists · tags</b><span>catalog, admin writes only</span></div>
+    <div class="dc"><b>playlists/{id}/items</b><span>one song in many playlists</span></div>
+  </div>
+  <aside class="notes">15 Firestore collections. Key rules shown here: likes use the song id as the document id, reactions use shareId plus senderId, and a share is visible only if friends, sharing on, epoch current, active and still liked.</aside>
+</section>
+
+<!-- 27 BACKUP SOURCES -->
+<section class="slide backup" data-pose="dim" data-scrim="2" data-t="0">
+  <div class="top"><div class="eyebrow">Backup</div><h2>Sources.</h2></div>
+  <ul class="srclist">
+    <li>YouGov — How are global consumers finding new music? (Jan 2022)</li>
+    <li>YPulse — How Gen Z and Millennials discover music on social media (2019)</li>
+    <li>Moscati et al. — Familiarizing with Music, UMAP 2025</li>
+    <li>Kumar et al. — Risk "attention" or "adventure", IntRS 2018</li>
+    <li>Full links and limits of the evidence: Assignment 1 report, section 1.5–1.7</li>
+  </ul>
+  <aside class="notes">Backup: sources. The report lists links and the limits of the evidence.</aside>
+</section>
+
+</div><!-- /stage -->
+
+<div class="zone zl" id="zl"></div><div class="zone zr" id="zr"></div>
+
+<div id="hud">
+  <span id="count">01 / 24</span>
+  <span class="sp"></span>
+  <button id="btnGrid" title="All slides (G)">&#9638;</button>
+  <button id="btnMusic" title="Music (M)">♪</button>
+  <button id="btnNotes" title="Notes (N)">N</button>
+  <button id="btnFs" title="Fullscreen (F)">⛶</button>
+</div>
+<div id="overview"><div class="ovh"><b>All slides</b><span>click to jump &middot; G or Esc to close</span></div><div class="ovg" id="ovg"></div></div>
+<div id="notesPanel"><div class="nh"><b id="timer">0:00</b><span>/ 12:00</span><em id="slideT"></em></div><p id="notesText"></p></div>
+
+<script src="deck.js"></script>
+<script type="module">
+  try { await import('./backdrop.js'); } catch (e) { console.warn('3D backdrop unavailable (open via a local server):', e); document.body.classList.add('no3d'); }
+</script>
+</body>
+</html>
