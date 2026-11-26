@@ -65,6 +65,22 @@ Published surveys and studies support four needs behind Muser. They come from ot
 
 Competitor descriptions reflect the apps' public feature sets as generally known; the team should re-check them before submission.
 
+### 1.7 Similar swipe and social music apps
+
+Swipe-to-discover is not new. Several apps have tried it, and others focus on sharing songs between friends. The table lists a standard selection from public launch pages, press coverage and store listings. We did not check whether each app is still active or how many users it has.
+
+| App | Approach | Gap compared with Muser |
+| --- | --- | --- |
+| [The Best Song](https://techcrunch.com/2015/07/21/the-best-song-is-tinder-for-music-discovery) (2015) | Swipe to keep or skip, radio-style | No friend sharing; no user-set novelty level |
+| [Choosic](https://thenextweb.com/news/choosic-is-quite-literally-tinder-for-tunes) (2015) | Swipe right adds the song to a playlist | No social layer |
+| [Musiclips](https://www.producthunt.com/posts/musiclips) | Swipe to save songs to the user's Spotify library | Depends on Spotify; no friends |
+| [Groupie](https://apps.apple.com/us/app/id1595883863) | Friends timeline and public timeline of shared songs | No swipe deck; no revocable sharing |
+| [Superfan](https://apps.apple.com/us/app/superfan-the-social-music-app/id6443763704) | Discovery through friends instead of algorithms | No novelty control |
+
+Muser is not the first swipe-based or social music app. What is new is the combination: a swipe deck, a user-set Familiar Bar, and friend sharing with a privacy switch that hides past shares, in one app.
+
+**Lessons from music startups that closed.** Public coverage of closed music services points to licensing and cost more often than to the interface. Cymbal's developers said [licensing issues discourage developers from continuing](https://bandwagon.asia/articles/social-music-platform-cymbal-shutting-down). [Failory reports Turntable.fm was too expensive to run](https://www.failory.com/startups/music-failures). [TikTok Music closed in 2024 after about a year](https://www.musicradar.com/music-industry/tiktok-music-is-closing-for-good-in-november-after-just-over-a-year), with coverage citing weak traction against incumbents and licensing. Hypebot also lists [Twitter's music app and Apple's Ping as music-only social apps users did not adopt](https://www.hypebot.com/?p=17231). These sources are general; none explains why the apps in the table above ended or stayed small. Muser's response is the small cleared catalog, the no-download rule, and a scope limited to an MVP. User retention is still a risk to test in Assignment 2.
+
 ## 2. Functional requirements
 
 Muser has 39 functional requirements: 29 Must, 8 Should, 2 Could. Each one is written as a user story with acceptance criteria that Assignment 2 can test directly. IDs are used again in the traceability matrix (section 7).
