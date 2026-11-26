@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { useServices } from "@/application/services";
 import { strings } from "@/shared/strings";
-import { Button, EmptyState, ErrorState, Sheet, Skeleton, Text } from "@/shared/ui";
+import { Button, EmptyState, ErrorState, Sheet, SheetOption, Skeleton, Text } from "@/shared/ui";
 import { libraryKeys, usePlaylistActions, usePlaylists } from "../hooks";
 import { PlaylistNameSheet } from "./PlaylistNameSheet";
 
@@ -63,10 +63,9 @@ export function AddToPlaylistSheet({ songId, songTitle, onClose }: AddToPlaylist
         playlists.data?.map((playlist, index) => {
           const added = members[index]?.data?.some((entry) => entry.songId === songId) ?? false;
           return (
-            <Button
+            <SheetOption
               key={playlist.id}
               label={added ? t.alreadyAdded(playlist.name) : playlist.name}
-              variant="secondary"
               disabled={added || actions.addSong.isPending}
               onPress={() => actions.addSong.mutate({ playlistId: playlist.id, songId })}
             />

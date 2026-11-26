@@ -1,12 +1,21 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { strings } from "@/shared/strings";
-import { colors, sizes, spacing } from "@/shared/theme";
-import { Button, EmptyState, ErrorState, Header, ListSkeleton } from "@/shared/ui";
+import { colors, sizes } from "@/shared/theme";
+import {
+  DetailHeader,
+  EmptyState,
+  ErrorState,
+  ListSkeleton,
+  Sheet,
+  SheetOption,
+  Text,
+} from "@/shared/ui";
+import { Collection } from "../components/Collection";
 import { ConfirmSheet } from "../components/ConfirmSheet";
-import { EntryList } from "../components/EntryList";
+import { Collage } from "../components/Covers";
 import { PlaylistNameSheet } from "../components/PlaylistNameSheet";
 import { usePlaylistActions, usePlaylists, usePlaylistSongs } from "../hooks";
 
@@ -17,14 +26,14 @@ export function PlaylistDetailScreen({ playlistId }: { playlistId: string }) {
   const playlists = usePlaylists();
   const songs = usePlaylistSongs(playlistId);
   const actions = usePlaylistActions();
-  const [sheet, setSheet] = useState<"rename" | "delete" | null>(null);
+  const [sheet, setSheet] = useState<"manage" | "rename" | "delete" | null>(null);
   const playlist = playlists.data?.find((item) => item.id === playlistId);
   const goBack = () => router.back();
 
   if (playlists.data && !playlist) {
     return (
       <View style={styles.root}>
-        <Header title={t.title} onBack={goBack} />
+        <DetailHeader title={t.playlistHeader} eyebrow onBack={goBack} />
         <EmptyState title={t.playlistGone} />
       </View>
     );
@@ -32,35 +41,25 @@ export function PlaylistDetailScreen({ playlistId }: { playlistId: string }) {
 
   return (
     <View style={styles.root}>
-      <Header
-        title={playlist?.name ?? t.title}
-        {...(songs.data ? { subtitle: t.songCount(songs.data.length) } : {})}
+      <DetailHeader
+        title={t.playlistHeader}
+        eyebrow
         onBack={goBack}
+        right={
+          playlist ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t.manage}
+              onPress={() => setSheet("manage")}
+              style={styles.menu}
+            >
+              <Text variant="subheading" color="textSecondary">
+                •••
+              </Text>
+            </Pressable>
+          ) : null
+        }
       />
-      {playlist ? (
-        <View style={styles.actions}>
-          <Button
-            label={t.rename}
-            variant="secondary"
-            size="sm"
-            fullWidth={false}
-            onPress={() => {
-              actions.rename.reset();
-              setSheet("rename");
-            }}
-          />
-          <Button
-            label={t.deletePlaylist}
-            variant="destructive"
-            size="sm"
-            fullWidth={false}
-            onPress={() => {
-              actions.remove.reset();
-              setSheet("delete");
-            }}
-          />
-        </View>
-      ) : null}
       {songs.isError || playlists.isError ? (
         <ErrorState
           onRetry={() => {
@@ -68,17 +67,41 @@ export function PlaylistDetailScreen({ playlistId }: { playlistId: string }) {
             void songs.refetch();
           }}
         />
-      ) : !songs.data ? (
+      ) : !songs.data || !playlist ? (
         <ListSkeleton />
       ) : (
-        <EntryList
+        <Collection
+          eyebrow={t.playlistFrom}
+          name={playlist.name}
+          cover={<Collage entries={songs.data} seed={playlistId} size={sizes.detailCover} />}
           entries={songs.data}
+          queueId={`list:${playlistId}`}
           playlistId={playlistId}
+          action={{ label: t.addSongs, onPress: () => router.navigate("/search") }}
           emptyTitle={t.playlistEmpty}
           emptyMessage={t.playlistEmptyHint}
         />
       )}
 
+      {sheet === "manage" && playlist ? (
+        <Sheet title={playlist.name} onClose={() => setSheet(null)}>
+          <SheetOption
+            label={t.rename}
+            onPress={() => {
+              actions.rename.reset();
+              setSheet("rename");
+            }}
+          />
+          <SheetOption
+            label={t.deletePlaylist}
+            destructive
+            onPress={() => {
+              actions.remove.reset();
+              setSheet("delete");
+            }}
+          />
+        </Sheet>
+      ) : null}
       {sheet === "rename" && playlist ? (
         <PlaylistNameSheet
           title={t.renameTitle}
@@ -97,6 +120,7 @@ export function PlaylistDetailScreen({ playlistId }: { playlistId: string }) {
           title={t.deleteTitle}
           message={t.deleteMessage}
           confirmLabel={t.deletePlaylist}
+          keepLabel={t.keepPlaylist}
           busy={actions.remove.isPending}
           failed={actions.remove.isError}
           onClose={() => setSheet(null)}
@@ -109,10 +133,10 @@ export function PlaylistDetailScreen({ playlistId }: { playlistId: string }) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
-  actions: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    paddingHorizontal: sizes.pagePadding,
-    marginBottom: spacing.md,
+  menu: {
+    width: sizes.touchTarget,
+    height: sizes.touchTarget,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

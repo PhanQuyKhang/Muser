@@ -29,6 +29,8 @@ export interface InputProps extends Pick<
   helperColor?: ColorToken;
   /** Adds a show/hide control and hides the characters. */
   secure?: boolean;
+  /** The label is only read aloud (the Figma sheets show a placeholder). */
+  hideLabel?: boolean;
 }
 
 export function Input({
@@ -37,6 +39,7 @@ export function Input({
   helper,
   helperColor = "textSecondary",
   secure = false,
+  hideLabel = false,
   editable = true,
   ...rest
 }: InputProps) {
@@ -47,7 +50,7 @@ export function Input({
 
   return (
     <View style={styles.group}>
-      <Text variant="fieldLabel">{label}</Text>
+      {hideLabel ? null : <Text variant="fieldLabel">{label}</Text>}
       <View style={[styles.field, { borderColor }, !editable && styles.readOnly]}>
         <TextInput
           {...rest}

@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import { useServices } from "@/application/services";
 import type { Song } from "@/domain/catalog";
-import { matchesSong } from "@/features/library/filter";
+import { matchesSong, normalizeText } from "@/features/library/filter";
 import { useDebouncedValue } from "@/shared/utils/useDebouncedValue";
 
 const FIVE_MINUTES = 5 * 60 * 1000;
@@ -29,6 +29,23 @@ export function useCatalogSongs() {
   });
 }
 
+export interface ArtistSummary {
+  id: string;
+  name: string;
+}
+
+/** Every artist credited on these songs, once each, in the order they first appear. */
+export function artistsOf(songs: Song[]): ArtistSummary[] {
+  const found = new Map<string, string>();
+  for (const song of songs) {
+    song.artistIds.forEach((id, index) => {
+      const name = song.artistNames[index];
+      if (name && !found.has(id)) found.set(id, name);
+    });
+  }
+  return [...found].map(([id, name]) => ({ id, name }));
+}
+
 /** Global Search filters the cached catalog on the device, after a short typing pause. */
 export function useSongSearch(rawQuery: string) {
   const catalog = useCatalogSongs();
@@ -37,9 +54,15 @@ export function useSongSearch(rawQuery: string) {
     () => (query ? (catalog.data ?? []).filter((song) => matchesSong(song, query)) : []),
     [catalog.data, query],
   );
+  const artists = useMemo(() => {
+    if (!query) return [];
+    const needle = normalizeText(query);
+    return artistsOf(results).filter((artist) => normalizeText(artist.name).includes(needle));
+  }, [results, query]);
 
   return {
     results,
+    artists,
     typed: rawQuery.trim().length > 0,
     loading: catalog.isLoading || rawQuery.trim() !== query,
     error: catalog.isError,

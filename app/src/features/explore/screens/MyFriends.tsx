@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { useServices } from "@/application/services";
 import type { Sharer } from "@/domain/social";
 import { socialKeys, useDiscoveries, useFriends } from "@/features/social/hooks";
 import { strings } from "@/shared/strings";
-import { colors, radii, spacing } from "@/shared/theme";
-import { Avatar, Button, EmptyState, ErrorState, ListSkeleton, Text } from "@/shared/ui";
+import { colors, radii, sizes, spacing } from "@/shared/theme";
+import { EmptyState, ErrorState, Icon, ListSkeleton, Text, initialsOf } from "@/shared/ui";
 import { Deck } from "../components/Deck";
+import { useReleasePlayerWhen } from "../hooks";
 
 const t = strings.explore;
 
@@ -17,8 +18,12 @@ const t = strings.explore;
 export function MyFriends() {
   const friends = useFriends();
   const discoveries = useDiscoveries();
+  const failed = friends.isError || discoveries.isError;
+  useReleasePlayerWhen(
+    failed || !friends.data?.length || !discoveries.data || discoveries.data.length === 0,
+  );
 
-  if (friends.isError || discoveries.isError) {
+  if (failed) {
     return (
       <ErrorState
         onRetry={() => {
@@ -52,13 +57,15 @@ export function MyFriends() {
 
   return (
     <Deck
+      deckId="friends"
       cards={discoveries.data.map(({ song, sharers }) => ({
         song,
         ...(sharers[0] ? { shareId: sharers[0].shareId } : {}),
-        // Differs from the card's key (the two are siblings) and resets the heart per song.
-        extra: <Attribution key={`sharers-${song.id}`} sharers={sharers} />,
+        // The key resets the heart's request id for each song.
+        attribution: <Attribution key={song.id} sharers={sharers} />,
       }))}
       source="friends"
+      context={t.friendsContext}
       onRestart={() => void discoveries.refetch()}
     />
   );
@@ -79,42 +86,76 @@ function Attribution({ sharers }: { sharers: Sharer[] }) {
   });
 
   if (!first) return null;
-  const others = sharers.length - 1;
   const sent = first.heartSent || heart.isSuccess;
 
   return (
-    <View style={styles.attribution}>
-      <View style={styles.who}>
-        <Avatar name={first.displayName} size={32} />
-        <Text variant="bodySmallStrong" style={styles.name}>
-          {t.lovedBy(first.displayName, others)}
+    <View style={styles.column}>
+      <View style={styles.pill}>
+        <View style={styles.avatar}>
+          <Text variant="captionMedium" color="onAccent">
+            {initialsOf(first.displayName)}
+          </Text>
+        </View>
+        <Text variant="optionHint" numberOfLines={1} style={styles.name}>
+          {t.lovedBy(first.displayName, sharers.length - 1)}
         </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={sent ? t.heartSent : t.sendHeartTo(first.displayName)}
+          accessibilityState={{ disabled: sent, busy: heart.isPending }}
+          disabled={sent || heart.isPending}
+          onPress={() => heart.mutate(first.shareId)}
+          style={styles.heart}
+        >
+          <Icon
+            name={sent ? "heartFilled" : "heart"}
+            size={sizes.iconSmall}
+            color={sent ? "secondary" : "textPrimary"}
+          />
+        </Pressable>
       </View>
-      <Button
-        label={sent ? t.heartSent : t.sendHeart}
-        accessibilityLabel={sent ? t.heartSent : t.sendHeartTo(first.displayName)}
-        variant="secondary"
-        size="sm"
-        disabled={sent}
-        loading={heart.isPending}
-        onPress={() => heart.mutate(first.shareId)}
-      />
       {heart.isError ? (
-        <Text variant="micro" color="error" accessibilityLiveRegion="polite">
-          {strings.common.actionFailed}
-        </Text>
+        <View style={styles.error}>
+          <Text variant="micro" color="error" accessibilityLiveRegion="polite">
+            {strings.common.actionFailed}
+          </Text>
+        </View>
       ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  attribution: {
+  column: { gap: spacing.xs, maxWidth: "100%" },
+  pill: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.sm,
-    padding: spacing.md,
-    borderRadius: radii.row,
-    backgroundColor: colors.surface,
+    height: sizes.touchTarget,
+    paddingLeft: spacing.sm,
+    borderRadius: radii.pill,
+    backgroundColor: colors.background,
+    maxWidth: "100%",
   },
-  who: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  name: { flex: 1 },
+  avatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.primary,
+  },
+  name: { flexShrink: 1 },
+  heart: {
+    width: sizes.touchTarget,
+    height: sizes.touchTarget,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  error: {
+    alignSelf: "flex-start",
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.pill,
+    backgroundColor: colors.background,
+  },
 });

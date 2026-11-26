@@ -1,10 +1,10 @@
 import { router } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useSharing } from "@/features/social/hooks";
 import { strings } from "@/shared/strings";
 import { colors, radii, sizes, spacing } from "@/shared/theme";
-import { ErrorState, Header, ListSkeleton, Switch, Text } from "@/shared/ui";
+import { DetailHeader, ErrorState, ListSkeleton, Switch, Text } from "@/shared/ui";
 
 const t = strings.privacy;
 
@@ -15,17 +15,24 @@ export function PrivacyScreen() {
 
   return (
     <View style={styles.root}>
-      <Header title={t.title} onBack={() => router.back()} />
+      <DetailHeader title={t.title} onBack={() => router.back()} />
       {query.isError ? (
         <ErrorState onRetry={() => void query.refetch()} />
       ) : enabled === undefined ? (
         <ListSkeleton rows={1} />
       ) : (
-        <View style={styles.content}>
-          <View style={styles.card}>
-            <Text variant="label" style={styles.label}>
-              {t.share}
-            </Text>
+        <ScrollView contentContainerStyle={styles.content}>
+          <Text variant="headline">{t.headline}</Text>
+          <Text variant="body" color="textSecondary">
+            {t.intro}
+          </Text>
+          <View style={styles.switchCard}>
+            <View style={styles.switchText}>
+              <Text variant="optionTitle">{t.share}</Text>
+              <Text variant="micro" color="textSecondary">
+                {t.shareHint}
+              </Text>
+            </View>
             <Switch
               label={t.share}
               value={enabled}
@@ -33,18 +40,26 @@ export function PrivacyScreen() {
               onValueChange={(value) => update.mutate(value)}
             />
           </View>
-          <Text variant="body" color={enabled ? "secondary" : "textSecondary"}>
-            {enabled ? t.on : t.off}
-          </Text>
-          <Text variant="bodySmall" color="textSecondary">
-            {t.explanation}
+          <View style={styles.rules}>
+            <Text variant="optionTitle" color="secondary">
+              {t.ruleTitle}
+            </Text>
+            <Text variant="optionHint" color="textSecondary">
+              {t.rule}
+            </Text>
+            <Text variant="optionHint" color="textSecondary">
+              {t.explanation}
+            </Text>
+          </View>
+          <Text variant="micro" color="textSecondary">
+            {t.footnote}
           </Text>
           {update.isError ? (
             <Text variant="bodySmall" color="error" accessibilityLiveRegion="polite">
               {strings.common.actionFailed}
             </Text>
           ) : null}
-        </View>
+        </ScrollView>
       )}
     </View>
   );
@@ -52,15 +67,22 @@ export function PrivacyScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
-  content: { paddingHorizontal: sizes.pagePadding, gap: spacing.md },
-  card: {
-    minHeight: 64,
+  content: { paddingHorizontal: sizes.pagePadding, paddingBottom: spacing.xl, gap: spacing.lg },
+  switchCard: {
+    minHeight: 78,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radii.row,
+    paddingHorizontal: spacing.lg + 2,
+    marginTop: spacing.lg,
+    borderRadius: radii.row + 2,
     backgroundColor: colors.surface,
   },
-  label: { flex: 1 },
+  switchText: { flex: 1, gap: spacing.xs },
+  rules: {
+    gap: spacing.md,
+    padding: spacing.lg + 2,
+    borderRadius: radii.row + 2,
+    backgroundColor: colors.surface,
+  },
 });

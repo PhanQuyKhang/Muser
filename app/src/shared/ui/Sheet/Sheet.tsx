@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { strings } from "@/shared/strings";
 import { colors, radii, sizes, spacing } from "@/shared/theme";
+import { Icon } from "../Icon";
 import { Text } from "../Text";
 
 export interface SheetProps {
@@ -30,14 +31,26 @@ export function Sheet({ title, message, onClose, children }: SheetProps) {
           accessibilityViewIsModal
           style={[styles.panel, { paddingBottom: insets.bottom + spacing.lg }]}
         >
+          <View style={styles.handle} />
           <View style={styles.header}>
-            <Text variant="sectionTitle">{title}</Text>
-            {message ? (
-              <Text variant="bodySmall" color="textSecondary">
-                {message}
-              </Text>
-            ) : null}
+            <Text variant="tileTitle" numberOfLines={2} style={styles.title}>
+              {title}
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={strings.common.close}
+              hitSlop={spacing.sm}
+              onPress={onClose}
+              style={styles.close}
+            >
+              <Icon name="close" size={sizes.iconSmall} color="textPrimary" />
+            </Pressable>
           </View>
+          {message ? (
+            <Text variant="optionHint" color="textSecondary">
+              {message}
+            </Text>
+          ) : null}
           <ScrollView
             style={styles.scroll}
             contentContainerStyle={styles.content}
@@ -60,10 +73,26 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: radii.sheet,
     borderTopRightRadius: radii.sheet,
     paddingHorizontal: sizes.pagePadding,
-    paddingTop: spacing.xl,
-    gap: spacing.lg,
+    paddingTop: spacing.md,
+    gap: spacing.md,
   },
-  header: { gap: spacing.xs },
+  handle: {
+    alignSelf: "center",
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.disabled,
+  },
+  header: { flexDirection: "row", alignItems: "center", gap: spacing.md },
+  title: { flex: 1 },
+  close: {
+    width: sizes.sheetClose,
+    height: sizes.sheetClose,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: sizes.sheetClose / 2,
+    backgroundColor: colors.surfaceElevated,
+  },
   scroll: { flexGrow: 0 },
   content: { gap: spacing.sm },
 });

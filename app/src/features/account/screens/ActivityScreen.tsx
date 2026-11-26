@@ -4,7 +4,14 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { useActivity } from "@/features/social/hooks";
 import { strings } from "@/shared/strings";
 import { colors, radii, sizes, spacing } from "@/shared/theme";
-import { Avatar, EmptyState, ErrorState, Header, ListSkeleton, Text } from "@/shared/ui";
+import {
+  DetailHeader,
+  EmptyState,
+  ErrorState,
+  ListSkeleton,
+  PersonAvatar,
+  Text,
+} from "@/shared/ui";
 import { relativeTime } from "../relative-time";
 
 const t = strings.activity;
@@ -15,7 +22,7 @@ export function ActivityScreen() {
 
   return (
     <View style={styles.root}>
-      <Header title={t.title} onBack={() => router.back()} />
+      <DetailHeader title={t.title} onBack={() => router.back()} />
       <ScrollView contentContainerStyle={styles.content}>
         {activity.isError ? (
           <ErrorState onRetry={() => void activity.refetch()} />
@@ -28,7 +35,7 @@ export function ActivityScreen() {
             const name = item.actor?.displayName ?? t.someone;
             return (
               <View key={item.id} style={styles.row} accessible>
-                <Avatar name={name} />
+                <PersonAvatar name={name} seed={item.actor?.uid ?? name} />
                 <View style={styles.text}>
                   <Text variant="bodySmallStrong">{t.sentHeart(name)}</Text>
                   <Text variant="micro" color="textSecondary">

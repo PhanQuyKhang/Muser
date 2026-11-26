@@ -1,10 +1,12 @@
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
+import { useExploreFeed } from "@/application/explore-feed";
 import { strings } from "@/shared/strings";
-import { colors } from "@/shared/theme";
-import { ErrorState, Header, ListSkeleton } from "@/shared/ui";
-import { EntryList } from "../components/EntryList";
+import { colors, sizes } from "@/shared/theme";
+import { DetailHeader, ErrorState, Icon, ListSkeleton } from "@/shared/ui";
+import { Collection } from "../components/Collection";
+import { LikedCover } from "../components/Covers";
 import { useLikes } from "../hooks";
 
 const t = strings.library;
@@ -15,18 +17,30 @@ export function LikedScreen() {
 
   return (
     <View style={styles.root}>
-      <Header
-        title={t.liked}
-        {...(likes.data ? { subtitle: t.songCount(likes.data.length) } : {})}
+      <DetailHeader
+        title={t.likedHeader}
+        eyebrow
         onBack={() => router.back()}
+        right={<Icon name="likedBadge" size={sizes.iconSmall} color="secondary" />}
       />
       {likes.isError ? (
         <ErrorState onRetry={() => void likes.refetch()} />
       ) : !likes.data ? (
         <ListSkeleton />
       ) : (
-        <EntryList
+        <Collection
+          eyebrow={t.likedFrom}
+          name={t.liked}
+          cover={<LikedCover size={sizes.detailCover} />}
           entries={likes.data}
+          queueId="list:liked"
+          action={{
+            label: t.discoverMore,
+            onPress: () => {
+              useExploreFeed.getState().setFeed("mine");
+              router.navigate("/explore");
+            },
+          }}
           emptyTitle={t.likedEmpty}
           emptyMessage={t.likedHint}
           confirmUnlike

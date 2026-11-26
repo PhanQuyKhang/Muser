@@ -3,6 +3,9 @@ import { useEffect } from "react";
 import { create } from "zustand";
 
 import type { AuthUser } from "@/domain/auth";
+import { useExploreFeed } from "./explore-feed";
+import { usePlayerStore } from "./player";
+import { useRecentSearches } from "./recent-searches";
 import { useServices } from "./services";
 
 export type SessionStatus = "initializing" | "signedOut" | "signedIn";
@@ -33,7 +36,12 @@ export function useSessionSync(): void {
     return auth.subscribe((user) => {
       const uid = user?.uid ?? null;
       if (previousUid !== uid) void queryClient.cancelQueries();
-      if (previousUid !== null && previousUid !== uid) queryClient.clear();
+      if (previousUid !== null && previousUid !== uid) {
+        queryClient.clear();
+        usePlayerStore.getState().reset();
+        useRecentSearches.getState().clear();
+        useExploreFeed.getState().setFeed("mine");
+      }
       previousUid = uid;
       setUser(user);
     });

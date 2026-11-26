@@ -21,6 +21,12 @@ export const radii = {
   sheet: 24,
   /** Footer call-to-action buttons (large Continue). */
   cta: 16,
+  /** Swipe verdict badge. */
+  badge: 12,
+  /** Selected segment inside a segmented control. */
+  segment: 11,
+  /** The discovery level sheet. */
+  sheetLarge: 28,
   /** Fully rounded chips, pills and circular buttons. */
   pill: 999,
 } as const;
@@ -40,4 +46,38 @@ export const sizes = {
   iconDefault: 24,
   iconSmall: 20,
   borderWidth: 1,
+  /** Explore card and mini player side margin. */
+  cardInset: 20,
+  seekTouchHeight: 24,
+  seekTrack: 3,
+  seekThumb: 8,
+  timeRow: 20,
+  controlsWidth: 274,
+  iconSeek: 19,
+  iconMiniToggle: 22,
+  miniArtwork: 40,
+  exploreTabs: 46,
+  levelPill: 40,
+  genreBadge: 26,
+  attribution: 38,
+  verdictWidth: 124,
+  radio: 20,
+  levelOption: 66,
+  sheetClose: 36,
+  savedToast: 36,
+  cardInfo: 106,
+  headerButton: 44,
+  likedCover: 108,
+  detailCover: 104,
+  rowCover: 72,
+  trackCover: 46,
+  playlistRow: 80,
+  trackRow: 56,
+  personAvatar: 44,
+  profileAvatar: 80,
+  searchField: 48,
+  browseTile: 124,
+  browseArt: 82,
+  filterPill: 38,
+  sheetOption: 52,
 } as const;

@@ -31,6 +31,14 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 200
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false
+        }
       ]
     ],
     "scheme": "muser",

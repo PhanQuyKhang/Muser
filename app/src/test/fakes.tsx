@@ -3,12 +3,16 @@ import type { ReactElement } from "react";
 import { render } from "@testing-library/react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { useExploreFeed } from "@/application/explore-feed";
+import { usePlayerStore } from "@/application/player";
+import { useRecentSearches } from "@/application/recent-searches";
 import { ServicesProvider, type Services } from "@/application/services";
 import { makePlaylist } from "./fixtures";
 import type { AuthRepository } from "@/domain/auth";
 import type { CatalogRepository } from "@/domain/catalog";
 import type { DiscoveryRepository } from "@/domain/discovery";
 import type { LibraryRepository } from "@/domain/library";
+import type { MediaRepository } from "@/domain/media";
 import type { MeRepository } from "@/domain/me";
 import type { OnboardingRepository } from "@/domain/onboarding";
 import type { SocialRepository } from "@/domain/social";
@@ -22,6 +26,7 @@ export function createFakeServices(
     library?: Partial<LibraryRepository>;
     social?: Partial<SocialRepository>;
     discovery?: Partial<DiscoveryRepository>;
+    media?: Partial<MediaRepository>;
   } = {},
 ): Services {
   const auth: AuthRepository = {
@@ -86,7 +91,14 @@ export function createFakeServices(
     recommend: jest.fn(async () => ({ level: "explore" as const, songs: [] })),
     ...overrides.discovery,
   };
-  return { auth, me, catalog, onboarding, library, social, discovery };
+  const media: MediaRepository = {
+    getPreview: jest.fn(async (songId: string) => ({
+      url: `https://preview.test/${songId}.mp3`,
+      expiresAt: "2026-11-26T12:15:00.000Z",
+    })),
+    ...overrides.media,
+  };
+  return { auth, me, catalog, onboarding, library, social, discovery, media };
 }
 
 const safeAreaMetrics = {
@@ -96,6 +108,9 @@ const safeAreaMetrics = {
 
 /** Renders a screen with fake services and a fresh query cache. */
 export async function renderWithServices(ui: ReactElement, services = createFakeServices()) {
+  useExploreFeed.getState().setFeed("mine");
+  useRecentSearches.getState().clear();
+  usePlayerStore.getState().reset();
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const result = await render(
     <SafeAreaProvider initialMetrics={safeAreaMetrics}>

@@ -1,11 +1,14 @@
 export { Avatar, initialsOf } from "./Avatar";
 export { Button } from "./Button";
 export { Chip } from "./Chip";
+export { DetailHeader, TabHeader } from "./Headers";
+export { NavCard } from "./NavCard";
+export { PersonAvatar } from "./PersonAvatar";
+export { Segmented } from "./Segmented";
+export { SheetOption } from "./SheetOption";
 export { CoverArt } from "./CoverArt";
-export { Header } from "./Header";
 export { Icon } from "./Icon";
 export { Input } from "./Input";
-export { ListRow } from "./ListRow";
 export { ListSkeleton } from "./ListSkeleton";
 export { Screen } from "./Screen";
 export { SearchField } from "./SearchField";

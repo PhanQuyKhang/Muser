@@ -6,6 +6,7 @@ import { ApiCatalogRepository } from "./api/catalog.repository";
 import { ApiDiscoveryRepository } from "./api/discovery.repository";
 import { ApiLibraryRepository } from "./api/library.repository";
 import { ApiMeRepository } from "./api/me.repository";
+import { ApiMediaRepository } from "./api/media.repository";
 import { ApiOnboardingRepository } from "./api/onboarding.repository";
 import { ApiSocialRepository } from "./api/social.repository";
 import { getFirebaseAuth } from "./firebase/firebase";
@@ -25,5 +26,6 @@ export function createServices(): Services {
     library: new ApiLibraryRepository(api),
     social: new ApiSocialRepository(api),
     discovery: new ApiDiscoveryRepository(api),
+    media: new ApiMediaRepository(api),
   };
 }

@@ -9,10 +9,17 @@ export interface SearchFieldProps {
   placeholder: string;
   /** Accessible name; defaults to the placeholder. */
   label?: string;
+  onSubmit?: () => void;
 }
 
 /** Search input with a leading magnifier and a clear action (Figma: Song search / Artist search). */
-export function SearchField({ value, onChangeText, placeholder, label }: SearchFieldProps) {
+export function SearchField({
+  value,
+  onChangeText,
+  placeholder,
+  label,
+  onSubmit,
+}: SearchFieldProps) {
   return (
     <View style={styles.field}>
       <Icon name="search" size={sizes.iconSmall} />
@@ -26,6 +33,7 @@ export function SearchField({ value, onChangeText, placeholder, label }: SearchF
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="search"
+        onSubmitEditing={onSubmit}
         style={styles.input}
       />
       {value ? (

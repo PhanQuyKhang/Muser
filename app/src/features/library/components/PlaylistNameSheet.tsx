@@ -8,6 +8,7 @@ const t = strings.library;
 
 interface PlaylistNameSheetProps {
   title: string;
+  message?: string;
   submitLabel: string;
   initialName?: string;
   submitting: boolean;
@@ -19,6 +20,7 @@ interface PlaylistNameSheetProps {
 /** O02 Create playlist and O06 Rename playlist. The typed name survives a failed save. */
 export function PlaylistNameSheet({
   title,
+  message,
   submitLabel,
   initialName = "",
   submitting,
@@ -30,9 +32,10 @@ export function PlaylistNameSheet({
   const trimmed = name.trim();
 
   return (
-    <Sheet title={title} onClose={onClose}>
+    <Sheet title={title} {...(message ? { message } : {})} onClose={onClose}>
       <Input
         label={t.nameLabel}
+        hideLabel
         value={name}
         onChangeText={setName}
         placeholder={t.namePlaceholder}
@@ -46,7 +49,6 @@ export function PlaylistNameSheet({
         loading={submitting}
         onPress={() => onSubmit(trimmed)}
       />
-      <Button label={strings.common.cancel} variant="tertiary" onPress={onClose} />
     </Sheet>
   );
 }

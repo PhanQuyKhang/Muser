@@ -4,6 +4,7 @@ import type { AuthRepository } from "@/domain/auth";
 import type { CatalogRepository } from "@/domain/catalog";
 import type { DiscoveryRepository } from "@/domain/discovery";
 import type { LibraryRepository } from "@/domain/library";
+import type { MediaRepository } from "@/domain/media";
 import type { MeRepository } from "@/domain/me";
 import type { OnboardingRepository } from "@/domain/onboarding";
 import type { SocialRepository } from "@/domain/social";
@@ -17,6 +18,7 @@ export interface Services {
   library: LibraryRepository;
   social: SocialRepository;
   discovery: DiscoveryRepository;
+  media: MediaRepository;
 }
 
 const ServicesContext = createContext<Services | null>(null);

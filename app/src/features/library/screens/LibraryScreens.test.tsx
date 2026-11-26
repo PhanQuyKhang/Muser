@@ -35,7 +35,8 @@ describe("PlaylistsScreen (S12)", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Create playlist" }));
     await fireEvent.changeText(screen.getByLabelText("Playlist name"), "  Night  ");
-    await fireEvent.press(screen.getByRole("button", { name: "Create" }));
+    // The header button and the sheet button share their name; the sheet one is last.
+    await fireEvent.press(screen.getAllByRole("button", { name: "Create playlist" }).at(-1)!);
     await waitFor(() => expect(services.library.createPlaylist).toHaveBeenCalledWith("Night"));
   });
 });
@@ -45,9 +46,10 @@ describe("LikedScreen (S13)", () => {
     const services = createFakeServices({ library: { listLikes: jest.fn(async () => [one]) } });
     await renderWithServices(<LikedScreen />, services);
 
-    await fireEvent.press(await screen.findByRole("button", { name: "Unlike One" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "More options for One" }));
+    await fireEvent.press(await screen.findByRole("button", { name: "Unlike song" }));
     expect(services.library.unlike).not.toHaveBeenCalled();
-    await fireEvent.press(screen.getByRole("button", { name: "Unlike" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Unlike song" }));
     await waitFor(() => expect(services.library.unlike).toHaveBeenCalledWith("s1"));
   });
 

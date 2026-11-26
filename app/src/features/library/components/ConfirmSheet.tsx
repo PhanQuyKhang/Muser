@@ -5,17 +5,20 @@ interface ConfirmSheetProps {
   title: string;
   message: string;
   confirmLabel: string;
+  /** The way out, for example "Keep playlist". */
+  keepLabel?: string;
   busy: boolean;
   failed: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }
 
-/** Confirmation for a destructive action (delete playlist, unlike, remove friend). */
+/** Confirmation for a destructive action (delete playlist, unlike, remove friend, sign out). */
 export function ConfirmSheet({
   title,
   message,
   confirmLabel,
+  keepLabel = strings.common.cancel,
   busy,
   failed,
   onConfirm,
@@ -28,8 +31,8 @@ export function ConfirmSheet({
           {strings.common.actionFailed}
         </Text>
       ) : null}
-      <Button label={confirmLabel} variant="destructive" loading={busy} onPress={onConfirm} />
-      <Button label={strings.common.cancel} variant="secondary" onPress={onClose} />
+      <Button label={confirmLabel} variant="danger" loading={busy} onPress={onConfirm} />
+      <Button label={keepLabel} variant="secondary" onPress={onClose} />
     </Sheet>
   );
 }

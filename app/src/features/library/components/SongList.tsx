@@ -1,15 +1,16 @@
 import { useState, type ReactElement } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 
+import { usePlayerStore } from "@/application/player";
 import type { Song } from "@/domain/catalog";
 import type { LikeSource } from "@/domain/library";
 import { strings } from "@/shared/strings";
 import { sizes, spacing } from "@/shared/theme";
-import { Button, Sheet, Text } from "@/shared/ui";
+import { Sheet, SheetOption, Text } from "@/shared/ui";
 import { useLikeToggle, usePlaylistActions } from "../hooks";
 import { AddToPlaylistSheet } from "./AddToPlaylistSheet";
 import { ConfirmSheet } from "./ConfirmSheet";
-import { SongRow } from "./SongRow";
+import { TrackRow } from "./TrackRow";
 
 const t = strings.library;
 
@@ -18,16 +19,26 @@ export interface SongListItem {
   song: Song | null;
 }
 
+/** Starts playing a list from one of its songs; the rest follow in the order shown. */
+export function playFrom(queueId: string, items: SongListItem[], songId: string): void {
+  const songs = items.flatMap((item) => (item.song ? [item.song] : []));
+  usePlayerStore.getState().play({ id: queueId, songs, autoAdvance: true }, songId);
+}
+
 interface SongListProps {
   items: SongListItem[];
   /** Recorded on a like made from this list. */
   source: LikeSource;
+  /** Names the playback queue, for example "list:liked". */
+  queueId: string;
   /** Set on a personal playlist, which adds "Remove from this playlist" to the song menu. */
   playlistId?: string;
   /** Ask before unliking (Liked, where the row disappears). */
   confirmUnlike?: boolean;
+  onPlay?: () => void;
   header?: ReactElement;
   empty?: ReactElement;
+  footer?: ReactElement;
 }
 
 type Open =
@@ -36,14 +47,17 @@ type Open =
   | { kind: "unlike"; item: SongListItem }
   | null;
 
-/** Song rows with their like button and song menu (O05, O03, O08). */
+/** Song rows with their song menu (O05, O03, O08). */
 export function SongList({
   items,
   source,
+  queueId,
   playlistId,
   confirmUnlike = false,
+  onPlay,
   header,
   empty,
+  footer,
 }: SongListProps) {
   const likes = useLikeToggle();
   const actions = usePlaylistActions();
@@ -53,8 +67,12 @@ export function SongList({
 
   const toggle = (item: SongListItem) => {
     const liked = likes.likedIds.has(item.songId);
-    if (liked && confirmUnlike) setOpen({ kind: "unlike", item });
-    else likes.toggle({ songId: item.songId, liked, source });
+    if (liked && confirmUnlike) {
+      setOpen({ kind: "unlike", item });
+      return;
+    }
+    likes.toggle({ songId: item.songId, liked, source });
+    close();
   };
 
   return (
@@ -65,7 +83,7 @@ export function SongList({
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.content}
         ListHeaderComponent={
-          <View style={styles.header}>
+          <View>
             {header}
             {likes.failed ? (
               <Text variant="bodySmall" color="error" accessibilityLiveRegion="polite">
@@ -75,39 +93,42 @@ export function SongList({
           </View>
         }
         {...(empty ? { ListEmptyComponent: empty } : {})}
+        {...(footer ? { ListFooterComponent: footer } : {})}
         renderItem={({ item }) => (
-          <SongRow
+          <TrackRow
             song={item.song}
             songId={item.songId}
-            liked={likes.likedIds.has(item.songId)}
-            likePending={likes.pendingId === item.songId}
-            onToggleLike={() => toggle(item)}
+            onPlay={() => {
+              playFrom(queueId, items, item.songId);
+              onPlay?.();
+            }}
             onMore={() => setOpen({ kind: "menu", item })}
           />
         )}
       />
 
       {open?.kind === "menu" ? (
-        <Sheet title={titleOf(open.item)} onClose={close}>
+        <Sheet
+          title={titleOf(open.item)}
+          {...(open.item.song ? { message: open.item.song.artistNames.join(", ") } : {})}
+          onClose={close}
+        >
           {open.item.song ? (
-            <Button
+            <SheetOption
               label={t.addToPlaylist}
-              variant="secondary"
               onPress={() => setOpen({ kind: "add", item: open.item })}
             />
           ) : null}
           {likes.likedIds.has(open.item.songId) ? (
-            <Button
-              label={t.unlike}
-              variant="secondary"
-              onPress={() => setOpen({ kind: "unlike", item: open.item })}
-            />
+            <SheetOption label={t.unlike} destructive onPress={() => toggle(open.item)} />
+          ) : open.item.song ? (
+            <SheetOption label={t.like} onPress={() => toggle(open.item)} />
           ) : null}
           {playlistId ? (
-            <Button
+            <SheetOption
               label={t.removeFromPlaylist}
-              variant="destructive"
-              loading={actions.removeSong.isPending}
+              destructive
+              disabled={actions.removeSong.isPending}
               onPress={() =>
                 actions.removeSong.mutate(
                   { playlistId, songId: open.item.songId },
@@ -121,7 +142,6 @@ export function SongList({
               {strings.common.actionFailed}
             </Text>
           ) : null}
-          <Button label={strings.common.cancel} variant="tertiary" onPress={close} />
         </Sheet>
       ) : null}
 
@@ -138,6 +158,7 @@ export function SongList({
           title={t.unlikeTitle}
           message={t.unlikeMessage}
           confirmLabel={t.unlike}
+          keepLabel={t.keepSong}
           busy={false}
           failed={false}
           onConfirm={() => {
@@ -153,5 +174,4 @@ export function SongList({
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: sizes.pagePadding, paddingBottom: spacing.xl, gap: spacing.sm },
-  header: { gap: spacing.md, marginBottom: spacing.xs },
 });

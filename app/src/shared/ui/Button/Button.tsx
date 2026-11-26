@@ -4,7 +4,8 @@ import { ActivityIndicator, Pressable, StyleSheet, View, type ViewStyle } from "
 import { colors, radii, sizes, spacing, type ColorToken } from "@/shared/theme";
 import { Text } from "../Text";
 
-export type ButtonVariant = "primary" | "secondary" | "like" | "tertiary" | "destructive";
+export type ButtonVariant =
+  "primary" | "secondary" | "like" | "tertiary" | "destructive" | "danger";
 /** md: 50 (forms), sm: 48 (compact), lg: 52 with the larger radius (footer call to action). */
 export type ButtonSize = "md" | "sm" | "lg";
 
@@ -33,6 +34,8 @@ const variants: Record<ButtonVariant, VariantStyle> = {
   like: { background: "secondary", text: "onAccent" },
   tertiary: { background: "transparent", text: "primary" },
   destructive: { background: "transparent", text: "error" },
+  /** The filled confirm button of a destructive sheet. */
+  danger: { background: "error", text: "onAccent" },
 };
 
 const heights: Record<ButtonSize, number> = {
