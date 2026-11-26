@@ -90,7 +90,7 @@ describe.skipIf(!host)("catalog against the Firestore emulator", () => {
   it("serves the full API from Firestore without leaking storage paths", async () => {
     const app = createApp({
       social: {} as never,
-      recommendations: {} as never,
+      recommendations: {} as never, media: {} as never,
       verifier: { verify: async () => ({ uid: "alice" }) },
       identity: {} as IdentityServices, // not used by catalog routes
       library: {} as LibraryService,
@@ -111,7 +111,7 @@ describe.skipIf(!host)("catalog against the Firestore emulator", () => {
   const makeApp = () =>
     createApp({
       social: {} as never,
-      recommendations: {} as never,
+      recommendations: {} as never, media: {} as never,
       verifier: { verify: async (t: string) => (t === "t" ? { uid: "alice" } : Promise.reject(new Error("bad"))) },
       identity: {} as IdentityServices, // not used by catalog routes
       library: {} as LibraryService,

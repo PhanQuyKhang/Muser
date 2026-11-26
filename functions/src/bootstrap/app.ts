@@ -15,6 +15,8 @@ import type { SocialService } from "../modules/social/application/social.service
 import { socialRouter } from "../modules/social/transport/social.controller";
 import type { RecommendationService } from "../modules/recommendation/application/recommendation.service";
 import { recommendationRouter } from "../modules/recommendation/transport/recommendation.controller";
+import type { MediaService } from "../modules/media/application/media.service";
+import { mediaRouter } from "../modules/media/transport/media.controller";
 
 export interface AppDependencies {
   verifier: TokenVerifier;
@@ -23,11 +25,12 @@ export interface AppDependencies {
   library: LibraryService;
   social: SocialService;
   recommendations: RecommendationService;
+  media: MediaService;
 }
 
 // Composition root: build the HTTP app from injected dependencies.
 export function createApp(deps: AppDependencies) {
-  const { verifier, identity, catalog, library, social, recommendations } = deps;
+  const { verifier, identity, catalog, library, social, recommendations, media } = deps;
   const app = express();
   app.disable("x-powered-by");
   app.use(requestContext);
@@ -48,6 +51,7 @@ export function createApp(deps: AppDependencies) {
     libraryRouter(library),
     socialRouter(social),
     recommendationRouter(recommendations),
+    mediaRouter(media),
   );
 
   app.use(notFoundHandler);

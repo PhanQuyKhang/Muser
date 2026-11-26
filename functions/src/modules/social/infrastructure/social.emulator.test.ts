@@ -57,6 +57,7 @@ describe.skipIf(!host)("social against the Firestore emulator", () => {
         songs,
         clock,
       }),
+      media: {} as never,
       recommendations: new RecommendationService({
         tastes: new FirestoreTasteRepository(db),
         catalog: { listActive: () => catalog.listActive() },

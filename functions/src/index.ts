@@ -21,6 +21,8 @@ import { SocialService } from "./modules/social/application/social.service";
 import { FirestoreSocialQueries, FirestoreSocialUnitOfWork } from "./modules/social/infrastructure/firestore-social";
 import { RecommendationService } from "./modules/recommendation/application/recommendation.service";
 import { FirestoreTasteRepository } from "./modules/recommendation/infrastructure/firestore-taste";
+import { MediaService } from "./modules/media/application/media.service";
+import { DeezerPreviewProvider } from "./modules/media/infrastructure/deezer-preview-provider";
 import {
   FirestoreIdentityQueries,
   FirestoreIdentityUnitOfWork,
@@ -65,6 +67,12 @@ const recommendations = new RecommendationService({
   catalog: { listActive: () => catalog.listActive() },
 });
 
+const media = new MediaService({
+  songs: { getSong: (id) => catalog.getSong(id) },
+  previews: new DeezerPreviewProvider(systemClock),
+  clock: systemClock,
+});
+
 // NOTE: before the first deploy, set the function region to match the Firestore region
 // (see docs/MUSER_DEPLOYMENT.md). It is intentionally not defaulted here.
 export const api = onRequest(
@@ -75,5 +83,6 @@ export const api = onRequest(
     library,
     social,
     recommendations,
+    media,
   }),
 );

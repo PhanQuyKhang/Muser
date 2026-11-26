@@ -18,7 +18,7 @@ const identity = {
   getMe: { execute: async () => ({ profile: null, onboardingCompleted: false }) },
   completeOnboarding: {},
 } as unknown as IdentityServices;
-const app = createApp({ verifier, identity, catalog: {} as CatalogService, library: {} as LibraryService, social: {} as never, recommendations: {} as never });
+const app = createApp({ verifier, identity, catalog: {} as CatalogService, library: {} as LibraryService, social: {} as never, recommendations: {} as never, media: {} as never });
 
 describe("authentication middleware (fake verifier)", () => {
   it("serves /healthz without authentication", async () => {

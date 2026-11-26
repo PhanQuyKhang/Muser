@@ -43,7 +43,7 @@ describe.skipIf(!host)("library against the Firestore emulator", () => {
     });
     app = createApp({
       social: {} as never,
-      recommendations: {} as never,
+      recommendations: {} as never, media: {} as never,
       verifier: { verify: async (t) => (t.startsWith("t-") ? { uid: t.slice(2) } : Promise.reject(new Error("bad"))) },
       identity: {} as IdentityServices, // not used by library routes
       catalog,
