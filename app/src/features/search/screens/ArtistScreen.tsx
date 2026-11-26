@@ -2,9 +2,18 @@ import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
 import { SongList, playFrom } from "@/features/library/components/SongList";
+import { useArtwork } from "@/features/media/hooks";
 import { strings } from "@/shared/strings";
 import { colors, radii, spacing } from "@/shared/theme";
-import { Button, DetailHeader, EmptyState, ErrorState, ListSkeleton, Text } from "@/shared/ui";
+import {
+  Button,
+  DetailHeader,
+  EmptyState,
+  ErrorState,
+  FillImage,
+  ListSkeleton,
+  Text,
+} from "@/shared/ui";
 import { toneFor } from "@/shared/ui/CoverArt";
 import { artistsOf, useCatalogSongs } from "../hooks";
 
@@ -16,6 +25,7 @@ export function ArtistScreen({ artistId }: { artistId: string }) {
   const songs = (catalog.data ?? []).filter((song) => song.artistIds.includes(artistId));
   const artist = artistsOf(songs).find((item) => item.id === artistId);
   const items = songs.map((song) => ({ songId: song.id, song }));
+  const artwork = useArtwork(artist?.songId);
   const queueId = `list:artist:${artistId}`;
 
   return (
@@ -40,6 +50,7 @@ export function ArtistScreen({ artistId }: { artistId: string }) {
                 style={[styles.hero, { backgroundColor: toneFor(artistId) }]}
               >
                 <Text variant="artLetter">{artist.name.charAt(0).toUpperCase()}</Text>
+                <FillImage uri={artwork?.artistImageUrl} />
               </View>
               <Text variant="titleLarge">{artist.name}</Text>
               <Text variant="optionHint" color="textSecondary">
@@ -68,6 +79,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: radii.row + 2,
+    overflow: "hidden",
   },
   section: { marginTop: spacing.md },
 });

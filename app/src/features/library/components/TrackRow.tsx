@@ -4,7 +4,8 @@ import { useCurrentSong } from "@/application/player";
 import type { Song } from "@/domain/catalog";
 import { strings } from "@/shared/strings";
 import { radii, sizes, spacing } from "@/shared/theme";
-import { CoverArt, Text } from "@/shared/ui";
+import { Text } from "@/shared/ui";
+import { SongCover } from "@/features/media/SongCover";
 
 const t = strings.library;
 
@@ -32,7 +33,12 @@ export function TrackRow({ song, songId, onPlay, onMore }: TrackRowProps) {
         onPress={onPlay}
         style={({ pressed }) => [styles.main, pressed && styles.pressed]}
       >
-        <CoverArt seed={song?.albumId ?? songId} label={title} size={sizes.trackCover} />
+        <SongCover
+          songId={songId}
+          seed={song?.albumId ?? songId}
+          label={title}
+          size={sizes.trackCover}
+        />
         <View style={styles.text}>
           <Text
             variant="bodySmallStrong"

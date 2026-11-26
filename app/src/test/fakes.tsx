@@ -92,6 +92,7 @@ export function createFakeServices(
     ...overrides.discovery,
   };
   const media: MediaRepository = {
+    getArtwork: jest.fn(async () => ({ coverUrl: null, artistImageUrl: null })),
     getPreview: jest.fn(async (songId: string) => ({
       url: `https://preview.test/${songId}.mp3`,
       expiresAt: "2026-11-26T12:15:00.000Z",

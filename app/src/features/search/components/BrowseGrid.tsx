@@ -1,11 +1,25 @@
 import { router } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 
+import { useArtwork } from "@/features/media/hooks";
 import { strings } from "@/shared/strings";
 import { colors, radii, sizes, spacing } from "@/shared/theme";
-import { Text } from "@/shared/ui";
+import { FillImage, Text } from "@/shared/ui";
 import { toneFor } from "@/shared/ui/CoverArt";
 import type { Category } from "../categories";
+import { useCatalogSongs } from "../hooks";
+
+/** The tilted cover on a tile, taken from the first song of that category. */
+function CategoryArt({ tagId }: { tagId: string }) {
+  const songs = useCatalogSongs().data;
+  const artwork = useArtwork(songs?.find((song) => song.tagIds.includes(tagId))?.id);
+
+  return (
+    <View style={[styles.art, { backgroundColor: toneFor(tagId) }]}>
+      <FillImage uri={artwork?.coverUrl} />
+    </View>
+  );
+}
 
 /** Two-column tiles that open a genre or mood. */
 export function BrowseGrid({ categories }: { categories: readonly Category[] }) {
@@ -19,7 +33,7 @@ export function BrowseGrid({ categories }: { categories: readonly Category[] }) 
           onPress={() => router.push({ pathname: "/search/browse/[tagId]", params: { tagId } })}
           style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
         >
-          <View style={[styles.art, { backgroundColor: toneFor(tagId) }]} />
+          <CategoryArt tagId={tagId} />
           <Text variant="tileTitle" color={color}>
             {name}
           </Text>
@@ -51,6 +65,7 @@ const styles = StyleSheet.create({
     width: sizes.browseArt,
     height: sizes.browseArt,
     borderRadius: radii.badge,
+    overflow: "hidden",
     transform: [{ rotate: "12deg" }],
   },
   pressed: { opacity: 0.85 },

@@ -1,11 +1,14 @@
 import { Pressable, StyleSheet, View } from "react-native";
 
+import { useArtwork } from "@/features/media/hooks";
 import { strings } from "@/shared/strings";
 import { colors, radii, spacing } from "@/shared/theme";
 import { CoverArt, Text } from "@/shared/ui";
 import type { ArtistSummary } from "../hooks";
 
 export function ArtistCard({ artist, onPress }: { artist: ArtistSummary; onPress: () => void }) {
+  const artwork = useArtwork(artist.songId);
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -13,7 +16,13 @@ export function ArtistCard({ artist, onPress }: { artist: ArtistSummary; onPress
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
-      <CoverArt seed={artist.id} label={artist.name} size={68} round />
+      <CoverArt
+        seed={artist.id}
+        label={artist.name}
+        size={68}
+        round
+        uri={artwork?.artistImageUrl}
+      />
       <View style={styles.text}>
         <Text variant="sectionTitle" numberOfLines={1}>
           {artist.name}

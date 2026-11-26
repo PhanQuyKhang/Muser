@@ -14,6 +14,7 @@ export { Screen } from "./Screen";
 export { SearchField } from "./SearchField";
 export { Sheet } from "./Sheet";
 export { Skeleton } from "./Skeleton";
+export { FillImage } from "./FillImage";
 export { EmptyState, ErrorState } from "./StateView";
 export { Switch } from "./Switch";
 export { Text } from "./Text";

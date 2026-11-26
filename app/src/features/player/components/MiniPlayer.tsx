@@ -9,7 +9,8 @@ import {
 } from "@/application/player";
 import { strings } from "@/shared/strings";
 import { colors, radii, sizes, spacing, type ColorToken } from "@/shared/theme";
-import { CoverArt, Icon, Text } from "@/shared/ui";
+import { Icon, Text } from "@/shared/ui";
+import { SongCover } from "@/features/media/SongCover";
 import type { IconName } from "@/shared/ui/Icon";
 import { usePlayerProgress } from "../PlayerProvider";
 
@@ -65,7 +66,12 @@ export function MiniPlayer() {
   return (
     <View style={styles.root}>
       <View style={styles.row}>
-        <CoverArt seed={song.albumId ?? song.id} label={song.title} size={sizes.miniArtwork} />
+        <SongCover
+          songId={song.id}
+          seed={song.albumId ?? song.id}
+          label={song.title}
+          size={sizes.miniArtwork}
+        />
         {/* There is no full player yet: an Explore song opens its card. */}
         <Pressable
           accessibilityRole={onCard ? "button" : "text"}

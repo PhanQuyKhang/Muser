@@ -32,18 +32,23 @@ export function useCatalogSongs() {
 export interface ArtistSummary {
   id: string;
   name: string;
+  /** A song this artist leads, used to find their picture. */
+  songId?: string;
 }
 
 /** Every artist credited on these songs, once each, in the order they first appear. */
 export function artistsOf(songs: Song[]): ArtistSummary[] {
-  const found = new Map<string, string>();
+  const found = new Map<string, ArtistSummary>();
   for (const song of songs) {
     song.artistIds.forEach((id, index) => {
       const name = song.artistNames[index];
-      if (name && !found.has(id)) found.set(id, name);
+      if (!name) return;
+      const artist = found.get(id) ?? { id, name };
+      if (index === 0 && !artist.songId) artist.songId = song.id;
+      found.set(id, artist);
     });
   }
-  return [...found].map(([id, name]) => ({ id, name }));
+  return [...found.values()];
 }
 
 /** Global Search filters the cached catalog on the device, after a short typing pause. */

@@ -2,9 +2,10 @@ import type { ReactNode } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import type { Song } from "@/domain/catalog";
+import { useArtwork } from "@/features/media/hooks";
 import { strings } from "@/shared/strings";
 import { colors, radii, sizes, spacing } from "@/shared/theme";
-import { Text } from "@/shared/ui";
+import { FillImage, Text } from "@/shared/ui";
 import { toneFor } from "@/shared/ui/CoverArt/CoverArt";
 
 interface DiscoveryCardProps {
@@ -28,10 +29,12 @@ export function DiscoveryCard({
   attribution,
   onMore,
 }: DiscoveryCardProps) {
+  const artwork = useArtwork(song.id);
+
   return (
     <View style={styles.card}>
       <View style={[styles.art, { backgroundColor: toneFor(song.albumId ?? song.id) }]}>
-        {/* Placeholder until the API serves cover images. */}
+        {/* Shown until the cover loads, or when there is none. */}
         <Text
           variant="artLetter"
           accessibilityElementsHidden
@@ -39,6 +42,7 @@ export function DiscoveryCard({
         >
           {song.title.trim().charAt(0).toUpperCase()}
         </Text>
+        <FillImage uri={artwork?.coverUrl} />
         {genre ? (
           <View style={styles.genre}>
             <Text variant="badge">{genre.toUpperCase()}</Text>

@@ -2,7 +2,8 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 import type { Song } from "@/domain/catalog";
 import { colors, radii, sizes, spacing } from "@/shared/theme";
-import { CoverArt, Icon, Text } from "@/shared/ui";
+import { Icon, Text } from "@/shared/ui";
+import { SongCover } from "@/features/media/SongCover";
 
 interface SongChoiceRowProps {
   song: Song;
@@ -24,7 +25,7 @@ export function SongChoiceRow({ song, selected, disabled = false, onPress }: Son
       onPress={onPress}
       style={[styles.row, selected && styles.rowSelected, disabled && styles.rowDisabled]}
     >
-      <CoverArt seed={song.albumId ?? song.id} label={song.title} size={42} />
+      <SongCover songId={song.id} seed={song.albumId ?? song.id} label={song.title} size={42} />
       <View style={styles.text}>
         <Text variant="bodySmallStrong" numberOfLines={1}>
           {song.title}

@@ -1,6 +1,7 @@
 import { StyleSheet, View } from "react-native";
 
 import { colors } from "@/shared/theme";
+import { FillImage } from "../FillImage";
 import { Text } from "../Text";
 
 export interface CoverArtProps {
@@ -11,6 +12,8 @@ export interface CoverArtProps {
   size: number;
   /** Circular for artist portraits, rounded square for covers. */
   round?: boolean;
+  /** The picture, shown over the tile once it loads. */
+  uri?: string | null | undefined;
 }
 
 // Muted tones that sit on the dark UI; kept out of the theme because they are placeholder-only.
@@ -22,11 +25,8 @@ export function toneFor(seed: string): string {
   return TONES[hash % TONES.length] ?? TONES[0];
 }
 
-/**
- * Placeholder artwork. The catalog API exposes Storage paths, not image URLs (no media endpoint yet),
- * so covers and portraits render as a colored tile. Swap the body for an <Image> once URLs exist.
- */
-export function CoverArt({ seed, label, size, round = false }: CoverArtProps) {
+/** A cover or portrait: the picture when there is one, over a colored tile with a letter. */
+export function CoverArt({ seed, label, size, round = false, uri }: CoverArtProps) {
   return (
     <View
       accessibilityElementsHidden
@@ -44,10 +44,11 @@ export function CoverArt({ seed, label, size, round = false }: CoverArtProps) {
       <Text variant="label" style={{ color: colors.textPrimary, fontSize: Math.round(size * 0.4) }}>
         {label.trim().charAt(0).toUpperCase()}
       </Text>
+      <FillImage uri={uri} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  tile: { alignItems: "center", justifyContent: "center" },
+  tile: { alignItems: "center", justifyContent: "center", overflow: "hidden" },
 });

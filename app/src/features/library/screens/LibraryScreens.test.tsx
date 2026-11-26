@@ -53,6 +53,12 @@ describe("LikedScreen (S13)", () => {
     await waitFor(() => expect(services.library.unlike).toHaveBeenCalledWith("s1"));
   });
 
+  it("asks for each song's cover", async () => {
+    const services = createFakeServices({ library: { listLikes: jest.fn(async () => [one]) } });
+    await renderWithServices(<LikedScreen />, services);
+    await waitFor(() => expect(services.media.getArtwork).toHaveBeenCalledWith("s1"));
+  });
+
   it("offers Retry when loading fails", async () => {
     const services = createFakeServices({
       library: {
