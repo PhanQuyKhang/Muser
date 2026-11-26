@@ -37,6 +37,8 @@ export interface CatalogRepository {
   /** Active songs among these ids (batched read); unknown or inactive ids are omitted. */
   getSongs(ids: string[]): Promise<Song[]>;
   getArtist(id: string): Promise<Artist | null>;
+  /** Null when there is no such album. */
+  getAlbumTitle(id: string): Promise<string | null>;
   /** Active artists ordered by (normalizedName, id), optionally only those with a tag. */
   listArtists(query: ArtistQuery): Promise<ArtistPage>;
   /** Which of these ids exist AND are active in the given collection. */

@@ -68,7 +68,10 @@ const recommendations = new RecommendationService({
 });
 
 const media = new MediaService({
-  songs: { getSong: (id) => catalog.getSong(id) },
+  songs: {
+    getSong: (id) => catalog.getSong(id),
+    getAlbumTitle: (albumId) => catalog.getAlbumTitle(albumId),
+  },
   previews: new DeezerPreviewProvider(systemClock),
   clock: systemClock,
 });

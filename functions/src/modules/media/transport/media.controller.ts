@@ -21,5 +21,11 @@ export function mediaRouter(media: MediaService): Router {
     });
   });
 
+  router.get("/media/:songId/artwork", async (req, res) => {
+    const { songId } = parse(params, req.params);
+    const { coverUrl, artistImageUrl } = await media.getArtwork(songId);
+    res.json({ coverUrl, artistImageUrl, requestId: req.requestId });
+  });
+
   return router;
 }

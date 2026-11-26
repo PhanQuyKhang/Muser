@@ -71,6 +71,12 @@ export class FirestoreCatalogRepository implements CatalogRepository {
     return doc.exists && doc.get("status") === ACTIVE ? toSong(doc) : null;
   }
 
+  async getAlbumTitle(id: string): Promise<string | null> {
+    const doc = await this.db.collection("albums").doc(id).get();
+    const title: unknown = doc.get("title");
+    return typeof title === "string" ? title : null;
+  }
+
   async listArtists(query: ArtistQuery): Promise<ArtistPage> {
     let q: Query = this.db.collection("artists").where("status", "==", ACTIVE);
     // Needs the composite indexes in firebase/firestore.indexes.json (the emulator does not enforce them).

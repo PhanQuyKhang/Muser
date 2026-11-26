@@ -27,6 +27,17 @@ describe("pickPreview", () => {
     expect(pickPreview([track("Humble (Skrillex Remix)")], wanted)).toBeNull();
   });
 
+  it("prefers the wanted album over a compilation, even with a longer title", () => {
+    const candidates = [
+      { ...track("HUMBLE."), albumTitle: "Greatest Rap" },
+      { ...track("HUMBLE. (feat. Nobody)"), albumTitle: "DAMN. (Deluxe)" },
+    ];
+    expect(pickPreview(candidates, { ...wanted, albumTitle: "DAMN." })?.albumTitle).toBe(
+      "DAMN. (Deluxe)",
+    );
+    expect(pickPreview(candidates, wanted)?.albumTitle).toBe("Greatest Rap");
+  });
+
   it("ignores other artists, longer words and tracks without a clip", () => {
     const candidates = [
       track("HUMBLE.", "A Cover Band"),
@@ -38,13 +49,20 @@ describe("pickPreview", () => {
 });
 
 function providerReturning(body: unknown, status = 200) {
-  const fetchImpl = vi.fn(async () => new Response(JSON.stringify(body), { status }));
+  const fetchImpl = vi.fn(async (_url: unknown) => new Response(JSON.stringify(body), { status }));
   return { fetchImpl, provider: new DeezerPreviewProvider({ now: () => NOW }, fetchImpl) };
 }
 
 describe("DeezerPreviewProvider", () => {
   const result = (preview: string) => ({
-    data: [{ title: "HUMBLE.", preview, artist: { name: "Kendrick Lamar" } }],
+    data: [
+      {
+        title: "HUMBLE.",
+        preview,
+        artist: { name: "Kendrick Lamar", picture_big: "https://img.test/artist.jpg" },
+        album: { cover_big: "https://img.test/cover.jpg" },
+      },
+    ],
   });
 
   it("returns the link with the expiry it carries", async () => {
@@ -52,8 +70,20 @@ describe("DeezerPreviewProvider", () => {
     const url = `https://cdn.test/a.mp3?hdnea=exp=${exp}~acl=/a.mp3*~hmac=abc`;
     const { provider, fetchImpl } = providerReturning(result(url));
 
-    await expect(provider.findPreview(wanted)).resolves.toEqual({ url, expiresAt: new Date(exp * 1000) });
+    await expect(provider.findPreview(wanted)).resolves.toEqual({
+      url,
+      expiresAt: new Date(exp * 1000),
+      coverUrl: "https://img.test/cover.jpg",
+      artistImageUrl: "https://img.test/artist.jpg",
+    });
     expect(String(fetchImpl.mock.calls[0])).toContain("q=Kendrick%20Lamar%20HUMBLE.");
+  });
+
+  it("searches again by album name when the first results miss it", async () => {
+    const { provider, fetchImpl } = providerReturning(result("https://cdn.test/a.mp3"));
+    await provider.findPreview({ ...wanted, albumTitle: "DAMN." });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(String(fetchImpl.mock.calls[1])).toContain("DAMN.");
   });
 
   it("assumes a short lifetime when the link has no expiry", async () => {
@@ -81,6 +111,8 @@ function setup() {
   const findPreview = vi.fn(async () => ({
     url: "https://cdn.test/a.mp3",
     expiresAt: new Date(now.getTime() + 15 * 60_000),
+    coverUrl: "https://img.test/cover.jpg",
+    artistImageUrl: null,
   }));
   const media = new MediaService({
     songs: {
@@ -88,6 +120,7 @@ function setup() {
         if (id !== "song_humble") throw new AppError("NOT_FOUND", "Song not found");
         return { id, title: "HUMBLE.", artistNames: ["Kendrick Lamar"] } as Song;
       },
+      getAlbumTitle: async () => null,
     },
     previews: { findPreview },
     clock: { now: () => now },
@@ -104,8 +137,31 @@ function setup() {
   const play = (songId: string, token = "good-token") =>
     request(app).post(`/v1/media/${songId}/playback`).set("Authorization", `Bearer ${token}`);
   const advance = (ms: number) => (now = new Date(now.getTime() + ms));
-  return { play, advance, findPreview };
+  const art = (songId: string) =>
+    request(app).get(`/v1/media/${songId}/artwork`).set("Authorization", "Bearer good-token");
+  return { play, art, advance, findPreview };
 }
+
+describe("GET /v1/media/:songId/artwork", () => {
+  it("returns the pictures, sharing one search with playback", async () => {
+    const { play, art, advance, findPreview } = setup();
+    const [cover] = await Promise.all([art("song_humble"), play("song_humble")]);
+    expect(cover.status).toBe(200);
+    expect(cover.body).toMatchObject({ coverUrl: "https://img.test/cover.jpg", artistImageUrl: null });
+
+    // Pictures do not expire, so they are never searched for again.
+    advance(60 * 60_000);
+    await art("song_humble");
+    expect(findPreview).toHaveBeenCalledTimes(1);
+  });
+
+  it("answers with nulls for a song the provider lacks, and 404 for an unknown song", async () => {
+    const { art, findPreview } = setup();
+    findPreview.mockResolvedValueOnce(null as never);
+    expect((await art("song_humble")).body).toMatchObject({ coverUrl: null });
+    expect((await art("song_unknown")).status).toBe(404);
+  });
+});
 
 describe("POST /v1/media/:songId/playback", () => {
   it("requires a signed-in caller", async () => {

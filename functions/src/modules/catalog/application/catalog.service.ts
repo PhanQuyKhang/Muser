@@ -66,6 +66,11 @@ export class CatalogService {
     return song;
   }
 
+  /** Null when the album is unknown. */
+  getAlbumTitle(albumId: string): Promise<string | null> {
+    return this.repo.getAlbumTitle(albumId);
+  }
+
   /** Browse artists A-Z (e.g. onboarding S08), optionally only those tagged with `tagId`. */
   async listArtists(input: {
     limit: number;
